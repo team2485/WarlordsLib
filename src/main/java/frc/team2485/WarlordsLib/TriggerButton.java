@@ -1,4 +1,4 @@
-package common;
+package frc.team2485.WarlordsLib;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
