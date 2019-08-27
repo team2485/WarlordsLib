@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib;
+package frc.team2485.WarlordsLib.oi;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -18,7 +18,7 @@ public class TriggerButton extends JoystickButton {
      * @param joystick The GenericHID object that has the button (e.g. Joystick, KinectStick,
    *                     etc)
      * @param port The port number of the joystick for the button.
-     * @param threshold The minimum value the joystick must return to trigger a button.
+     * @param threshold The minimum value the joystick must return to trigger a button. Can be negative, which will invert!
      */
     public TriggerButton(GenericHID joystick, int port, double threshold) {
         super(joystick, port);

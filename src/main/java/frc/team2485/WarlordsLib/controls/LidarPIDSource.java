@@ -1,4 +1,4 @@
-package common.control;
+package frc.team2485.WarlordsLib.controls;
 
 import java.util.LinkedList;
 import java.util.Timer;

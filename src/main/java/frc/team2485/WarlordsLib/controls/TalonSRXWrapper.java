@@ -1,4 +1,4 @@
-package common.control;
+package frc.team2485.WarlordsLib.controls;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;

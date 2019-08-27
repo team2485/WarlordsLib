@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib;
+package frc.team2485.WarlordsLib.oi;
 
 /**
  * 
@@ -11,7 +11,7 @@ package frc.team2485.WarlordsLib;
  */
 public class ThresholdHandler {
 	
-	public static final double STANDARD_THRESHOLD = 0.1; 
+	public static final double STANDARD_THRESHOLD = 0.2;
 
 	/**
 	 * Thresholds and scales values linearly.                                                                      
@@ -36,6 +36,28 @@ public class ThresholdHandler {
 		double returnVal = ((absoluteMax - absoluteMin) / (1 - threshold)) * (Math.abs(val) - threshold) + absoluteMin; 
 		
 		return val > 0 ? returnVal : -returnVal; 
+	}
+
+	/**
+	 * Thresholds and scales values linearly.
+	 * <code>(1 / (1 - t)) * (v - t) + min;</code> where <code>1 / (1 - t)</code> is the slope.
+	 * Derived from fact that an input value of the threshold should return min : ( <code>f(threshold) = min</code> )
+	 * and an input value of 1 should return max : ( <code> f(1) = max </code> )
+	 *
+	 * @param val = raw input from controllers/joysticks
+	 * @param threshold = deadband threshold  (values less than this are ignored)
+	 *
+	 * @return Corrected input from joystick. If input is below threshold, 0 is returned.
+	 * 		   If not, input is scaled between 0 and 1.
+	 *
+	 */
+	public static double deadbandAndScale(double val, double threshold) {
+		if (Math.abs(val) <= threshold)
+			return 0;
+
+		double returnVal = (1 / (1 - threshold)) * (Math.abs(val) - threshold);
+
+		return val > 0 ? returnVal : -returnVal;
 	}
 	
 	/**
