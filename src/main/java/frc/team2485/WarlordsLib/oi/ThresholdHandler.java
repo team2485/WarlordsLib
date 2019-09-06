@@ -87,7 +87,4 @@ public class ThresholdHandler {
 		return val > 0 ? returnVal : -returnVal; 
 
 	}
-	
-	
-	
 }

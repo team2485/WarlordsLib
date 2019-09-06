@@ -1,13 +1,11 @@
-package frc.team2485.WarlordsLib.controls;
+package frc.team2485.WarlordsLib.control;
 
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-
 /**
- * PID Controller based mainly on Jeremy McCulloch's WarlordsPIDController.
- * Takes some ideas from WPILib's PIDController.
+ * PID Controller based mainly on Jeremy McCulloch's PIDController.
+ * Takes some ideas from WPILib's WL_PIDController.
  *
  * @author Jeremy McCulloch
  * @author Nathan Sariowan
@@ -215,7 +213,6 @@ public class CoupledPIDController extends SendableBase implements ControlSystem 
         return m_setpoint;
     }
 
-    @Override
     public void setSetpoint(double setpoint) {
         if (m_maxInput > m_minInput) {
             m_setpoint = Math.max(m_minInput, Math.min(setpoint, m_maxInput));
@@ -320,7 +317,7 @@ public class CoupledPIDController extends SendableBase implements ControlSystem 
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("PIDController");
+        builder.setSmartDashboardType("WL_PIDController");
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);

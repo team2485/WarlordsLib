@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib.controls;
+package frc.team2485.WarlordsLib.control;
 
 public interface ControlSystem {
 
