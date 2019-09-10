@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 public class TalonSRXWrapper extends WPI_TalonSRX {
 
 	// Control mode when setting Talon
-	private ControlMode m_controlMode;
+	private ControlMode controlMode;
 
 	/**
 	 * Constructor
@@ -21,7 +21,7 @@ public class TalonSRXWrapper extends WPI_TalonSRX {
 	 */
 	public TalonSRXWrapper(ControlMode controlMode, int deviceNumber) {
 		super(deviceNumber);
-		this.m_controlMode = controlMode;
+		this.controlMode = controlMode;
 	}
 
 	public TalonSRXWrapper(int deviceNumber) {
@@ -30,14 +30,14 @@ public class TalonSRXWrapper extends WPI_TalonSRX {
 
 	@Override
 	public void set(double speed) {
-		super.set(m_controlMode, speed);
+		super.set(controlMode, speed);
 	}
 
 	public ControlMode getControlMode() {
-		return m_controlMode;
+		return controlMode;
 	}
 
 	public void setControlMode(ControlMode controlMode) {
-		this.m_controlMode = controlMode;
+		this.controlMode = controlMode;
 	}
 }

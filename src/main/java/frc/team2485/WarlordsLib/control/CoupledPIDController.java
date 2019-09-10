@@ -8,9 +8,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Takes some ideas from WPILib's WL_PIDController.
  *
  * @author Jeremy McCulloch
- * @author Nathan Sariowan
  */
-public class CoupledPIDController extends SendableBase implements ControlSystem {
+public class CoupledPIDController extends SendableBase implements Controller {
 
     /**
      * Default period for WPILib is 20 milliseconds.
@@ -305,11 +304,12 @@ public class CoupledPIDController extends SendableBase implements ControlSystem 
     }
 
     @Override
-    public double calculate(double measurement) {
-        return calculate(measurement, 0);
+    public double calculate(double input) {
+        return calculate(input, 0);
     }
 
-    public void reset() {
+    @Override
+    public void disable() {
         m_totalError = 0;
         m_integratedError = 0;
         m_prevError = 0;

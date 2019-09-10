@@ -1,6 +1,6 @@
 package frc.team2485.WarlordsLib.control;
 
-public class FrictionController implements ControlSystem {
+public class FrictionController implements Controller {
 
     private double m_Kv;
     private double m_Vmax;
@@ -38,13 +38,18 @@ public class FrictionController implements ControlSystem {
     }
 
     @Override
-    public double calculate(double measurement) {
+    public double calculate(double input) {
         double output;
         if(m_setpoint >= 0.25){
-            output = m_Kv * ((m_Vmax - measurement) / m_Vmax);
+            output = m_Kv * ((m_Vmax - input) / m_Vmax);
         } else {
             output = 0;
         }
         return output;
+    }
+
+    @Override
+    public void disable() {
+
     }
 }
