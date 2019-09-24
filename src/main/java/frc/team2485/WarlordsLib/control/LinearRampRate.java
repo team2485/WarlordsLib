@@ -1,11 +1,11 @@
 package frc.team2485.WarlordsLib.control;
 
 /**
- * Based on Jeremey McCulloch's original RampRate class.
+ * Based on Jeremey McCulloch's original LinearRampRate class.
  * Generic class to ramp an output (velocity, voltage, current, etc). Has unique up and down rates.
  * @author Jeremey McCulloch
  */
-public class RampRate implements Processor {
+public class LinearRampRate implements Processor {
 
     private double lastValue;
 
@@ -14,7 +14,7 @@ public class RampRate implements Processor {
     private double maxErrorToDesired;
     private double scaledError;
 
-    public RampRate(double upRampRate, double downRampRate) {
+    public LinearRampRate(double upRampRate, double downRampRate) {
         this.upRampRate = upRampRate;
         this.downRampRate = downRampRate;
         this.lastValue = 0;
