@@ -46,7 +46,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
     private double m_minOutput = -1;
     private double m_maxOutput = 1;
 
-    enum Tolerance {
+    public enum Tolerance {
         kAbsolute, kPercent
     }
 
