@@ -1,6 +1,9 @@
 package frc.team2485.WarlordsLib.control;
 
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -75,6 +78,8 @@ public class CoupledPIDController extends SendableBase implements Controller {
 
     // True if output is at m_maxOutput
     private boolean m_atMaxOutput;
+
+    private double m_output;
 
     public CoupledPIDController(double P, double I, double D) {
         setPID(P, I, D);
@@ -303,6 +308,10 @@ public class CoupledPIDController extends SendableBase implements Controller {
         return output;
     }
 
+    private double getOutput() {
+        return m_output;
+    }
+
     @Override
     public double calculate(double input) {
         return calculate(input, 0);
@@ -315,6 +324,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
         m_prevError = 0;
     }
 
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("WL_PIDController");
@@ -323,7 +333,9 @@ public class CoupledPIDController extends SendableBase implements Controller {
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("t", this::getT, this::setT);
+        builder.setSafeState(this::disable);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+
     }
 
     /**
