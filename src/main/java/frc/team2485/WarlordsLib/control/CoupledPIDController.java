@@ -333,9 +333,16 @@ public class CoupledPIDController extends SendableBase implements Controller {
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("t", this::getT, this::setT);
+
+        builder.getEntry("p").setPersistent();
+        builder.getEntry("i").setPersistent();
+        builder.getEntry("d").setPersistent();
+        builder.getEntry("f").setPersistent();
+        builder.getEntry("t").setPersistent();
+
+        builder.addDoubleProperty("output", this::getOutput, null);
         builder.setSafeState(this::disable);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-
     }
 
     /**
