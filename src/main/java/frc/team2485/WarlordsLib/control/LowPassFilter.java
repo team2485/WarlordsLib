@@ -3,7 +3,7 @@ package frc.team2485.WarlordsLib.control;
 /**
  * Low pass input/output filter
  */
-public class LowPassFilter implements Processor {
+public class LowPassFilter implements ControlElement {
 
     private double filterCoefficient;
     private double lastValue;

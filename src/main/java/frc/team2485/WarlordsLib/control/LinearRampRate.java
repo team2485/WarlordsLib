@@ -5,7 +5,7 @@ package frc.team2485.WarlordsLib.control;
  * Generic class to ramp an output (velocity, voltage, current, etc). Has unique up and down rates.
  * @author Jeremey McCulloch
  */
-public class LinearRampRate implements Processor {
+public class LinearRampRate implements ControlElement {
 
     private double lastValue;
 

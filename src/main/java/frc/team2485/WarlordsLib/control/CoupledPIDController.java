@@ -1,9 +1,6 @@
 package frc.team2485.WarlordsLib.control;
 
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -11,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Takes some ideas from WPILib's WL_PIDController.
  *
  * @author Jeremy McCulloch
+ * @author Nathan Sariowan
  */
 public class CoupledPIDController extends SendableBase implements Controller {
 
@@ -19,81 +17,123 @@ public class CoupledPIDController extends SendableBase implements Controller {
      */
     public static final double DEFAULT_PERIOD = 0.02;
 
-    // Rate in seconds that the PID Controller runs at.
-    private double m_period;
+    /**
+     * Rate in seconds that the PID Controller runs at.
+     */
+    private double _period;
 
-    // Proportional Term
-    private double m_Kp;
+    /**
+     * Proportional Term
+     */
+    private double _kP;
 
-    // Integral Term
-    private double m_Ki;
+    /**
+     * Integral Term
+     */
+    private double _kI;
 
-    // Derivative Term
-    private double m_Kd;
+    /**
+     * Derivative Term
+     */
+    private double _kD;
 
-    // Feed Forward Term
-    private double m_Kf = 0;
+    
+    /**
+     * Feed Forward Term
+     */
+    private double _kF = 0;
 
-    // Integral anti-windup constant; multiplied by saturation error.
-    private double m_Kt = 0;
+    /**
+     * Integral anti-windup constant; multiplied by saturation error.
+     */
+    private double m_kT = 0;
 
-    // Set true if the max value of the system is equal to the min (endpoints wrap around)
-    private boolean m_continuous;
+    /**
+     * Set true if the max value of the system is equal to the min (endpoints wrap around)
+     */
+    private boolean _continuous;
 
-    private double m_minInput;
-    private double m_maxInput;
+    /**
+     * Min measurement input
+     */
+    private double _minInput;
 
-    // Difference between max input and min input
-    private double m_inputRange;
+    /**
+     * Max measurement input
+     */
+    private double _maxInput;
 
-    private double m_minOutput = -1;
-    private double m_maxOutput = 1;
+    /**
+     * Difference between max input and min input
+     */
+    private double _inputRange;
+
+    private double _minOutput = -1;
+    private double _maxOutput = 1;
 
     public enum Tolerance {
         kAbsolute, kPercent
     }
 
-    private Tolerance m_toleranceType = Tolerance.kAbsolute;
+    private Tolerance _toleranceType = Tolerance.kAbsolute;
 
-    private double m_tolerance = 0.0;
+    private double _tolerance = 0.0;
 
-    private double m_setpoint;
+    private double _setpoint;
 
-    private double m_error;
+    private double _error;
 
-    // The sum of all the error, integrated selectively to avoid I term windup (see calculate method)
-    private double m_integratedError;
+    /**
+     * The sum of all the error, integrated selectively to avoid I term windup (see calculate method)
+     */
+    private double _integratedError;
 
-    // Sum of all error
-    private double m_totalError;
+    /**
+     * Sum of all error
+     */
+    private double _totalError;
 
-    // Error calculated at previous calculate call
-    private double m_prevError;
+    /**
+     * Error calculated at previous calculate call
+     */
+    private double _prevError;
 
-    // The difference between the saturated (clamped) output and the unsaturated output.
-    private double m_saturationError;
+    /**
+     * Error calculated at previous calculate call
+     */
+    private double _saturationError;
 
-    // True if output is at m_minOutput
-    private boolean m_atMinOutput;
+    /**
+     * True if output is at _minOutput
+     */
+    private boolean _atMinOutput;
 
-    // True if output is at m_maxOutput
-    private boolean m_atMaxOutput;
+    /**
+     * True if output is at _maxOutput
+     */
+    private boolean _atMaxOutput;
 
-    private double m_output;
+    /**
+     * Last recorded output
+     */
+    private double _output;
 
     public CoupledPIDController(double P, double I, double D) {
         setPID(P, I, D);
-        this.m_period = DEFAULT_PERIOD;
+        this._period = DEFAULT_PERIOD;
     }
 
 
     public CoupledPIDController(double P, double I, double D, double period) {
         setPID(P, I, D);
-        m_period = period;
+        _period = period;
     }
 
+    /**
+     * @return milliseconds between each loop
+     */
     public double getPeriod() {
-        return m_period;
+        return _period;
     }
 
     /**
@@ -101,7 +141,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @return kP proportional constant
      */
     public double getP() {
-        return this.m_Kp;
+        return this._kP;
     }
 
     /**
@@ -109,7 +149,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @param P proportional constant
      */
     public void setP(double P) {
-        this.m_Kp = P;
+        this._kP = P;
     }
 
     /**
@@ -117,7 +157,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @return kI integral constant
      */
     public double getI() {
-        return this.m_Ki;
+        return this._kI;
     }
 
     /**
@@ -125,7 +165,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @param I integral constant
      */
     public void setI(double I) {
-        this.m_Ki = I;
+        this._kI = I;
     }
 
     /**
@@ -133,7 +173,7 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @return kD derivative constant
      */
     public double getD() {
-        return this.m_Kd;
+        return this._kD;
     }
 
     /**
@@ -141,45 +181,45 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @param D derivative constant
      */
     public void setD(double D) {
-        this.m_Kp = D;
+        this._kP = D;
     }
 
     /**
      * Returns feed forward constant
      * @return kF Feed forward Constant
      */
-    public double getF() { return this.m_Kf; }
+    public double getF() { return this._kF; }
 
     /**
      * Set feed forward constant
      * @param F
      */
-    public void setF(double F) { this. m_Kf = F; }
+    public void setF(double F) { this._kF = F; }
 
     /**
      * Get integral anti-windup constant
      * @return Kt constant
      */
-    public double getT() { return this.m_Kt; }
+    public double getT() { return this.m_kT; }
 
     /**
      * Set integral anti-windup constant, which is multiplied by the saturation error
      * @param T Kt constant
      */
-    public void setT(double T) { this. m_Kt = T; }
+    public void setT(double T) { this. m_kT = T; }
 
 
     public void setPID(double P, double I, double D) {
-        this.m_Kp = P;
-        this.m_Ki = I;
-        this.m_Kd = D;
+        this._kP = P;
+        this._kI = I;
+        this._kD = D;
     }
 
     public void setPIDF(double P, double I, double D, double F) {
-        this.m_Kp = P;
-        this.m_Ki = I;
-        this.m_Kd = D;
-        this.m_Kf = F;
+        this._kP = P;
+        this._kI = I;
+        this._kD = D;
+        this._kF = F;
     }
 
     /**
@@ -188,12 +228,12 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @param maxOutput
      */
     public void setOutputRange(double minOutput, double maxOutput) {
-        this.m_minOutput = minOutput;
-        this.m_maxOutput = maxOutput;
+        this._minOutput = minOutput;
+        this._maxOutput = maxOutput;
     }
 
     public double getInputRange() {
-        return m_inputRange;
+        return _inputRange;
     }
 
     /**
@@ -202,114 +242,114 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @param maxInput
      */
     public void setInputRange(double minInput, double maxInput) {
-        this.m_minInput = minInput;
-        this.m_maxInput = maxInput;
+        this._minInput = minInput;
+        this._maxInput = maxInput;
 
-        this.m_inputRange = maxInput - minInput;
+        this._inputRange = maxInput - minInput;
 
-        if (m_maxInput > m_minInput) {
-            m_setpoint = Math.max(m_minInput, Math.min(m_setpoint, m_maxInput));
+        if (_maxInput > _minInput) {
+            _setpoint = Math.max(_minInput, Math.min(_setpoint, _maxInput));
         }
 
     }
 
     public double getSetpoint() {
-        return m_setpoint;
+        return _setpoint;
     }
 
     public void setSetpoint(double setpoint) {
-        if (m_maxInput > m_minInput) {
-            m_setpoint = Math.max(m_minInput, Math.min(setpoint, m_maxInput));
+        if (_maxInput > _minInput) {
+            _setpoint = Math.max(_minInput, Math.min(setpoint, _maxInput));
         } else {
-            m_setpoint = setpoint;
+            _setpoint = setpoint;
         }
     }
 
     public double getError() {
-        return m_error;
+        return _error;
     }
 
     public void enableContinuousInput(double minInput, double maxInput) {
-        m_continuous = true;
+        _continuous = true;
         setInputRange(minInput, maxInput);
     }
 
     public void disableContinuousInput() {
-        m_continuous = false;
+        _continuous = false;
     }
 
     public boolean isContinuous() {
-        return this.m_continuous;
+        return this._continuous;
     }
 
     public void setAbsoluteTolerance(double absoluteTolerance) {
-        this.m_toleranceType = Tolerance.kAbsolute;
-        this.m_tolerance = absoluteTolerance;
+        this._toleranceType = Tolerance.kAbsolute;
+        this._tolerance = absoluteTolerance;
     }
 
     public void setPercentTolerance(double percentTolerance) {
-        this.m_toleranceType = Tolerance.kPercent;
-        this.m_tolerance = percentTolerance;
+        this._toleranceType = Tolerance.kPercent;
+        this._tolerance = percentTolerance;
     }
 
     public boolean atSetpoint() {
-        return atSetpoint(m_tolerance, m_toleranceType);
+        return atSetpoint(_tolerance, _toleranceType);
     }
 
     public boolean atSetpoint(double tolerance, Tolerance toleranceType) {
         if (toleranceType == Tolerance.kPercent) {
-            return Math.abs(m_error) < m_setpoint * tolerance;
+            return Math.abs(_error) < _setpoint * tolerance;
         } else  {
-            return Math.abs(m_error) < tolerance;
+            return Math.abs(_error) < tolerance;
         }
     }
 
     public double calculate(double measurement, double addTerm) {
-        m_prevError = m_error;
-        m_error = getContinuousError(m_setpoint - measurement);
-        m_totalError += m_error * m_period;
+        _prevError = _error;
+        _error = getContinuousError(_setpoint - measurement);
+        _totalError += _error * _period;
 
-        double pTerm = m_Kp * m_error;
+        double pTerm = _kP * _error;
 
         double iTerm;
 
-        // Anti-windup logic: reduce integral error by a constant
-        if (m_atMaxOutput || m_atMinOutput) {
-            iTerm = m_Ki * (m_totalError - m_Kt * m_saturationError);
+        // Anti-windup logic: reduce integral error by a constant if saturating
+        if (_atMaxOutput || _atMinOutput) {
+            iTerm = _kI * (_totalError - m_kT * _saturationError);
         } else {
-            //A temp integrated error for other anti-windup logic schemes to come
-            m_integratedError += m_error * m_period;
-            iTerm = m_Ki * m_totalError;
+            //A temp integrated error for other anti-windup logic schemes in the future
+            _integratedError += _error * _period;
+            iTerm = _kI * _totalError;
         }
 
-        double dTerm = m_Kd * m_Kp * ((m_error - m_prevError) / m_period);
+        double dTerm = _kD * _kP * ((_error - _prevError) / _period);
 
         double unclampedOutput = pTerm + iTerm + dTerm + addTerm;
 
         double output = 0;
 
         // Clamp output
-        if (unclampedOutput < m_minOutput) {
-            output = m_minOutput;
-            m_atMinOutput = true;
-            m_atMaxOutput = false;
-        } else if (unclampedOutput > m_maxOutput) {
-            output = m_maxOutput;
-            m_atMinOutput = false;
-            m_atMaxOutput = true;
+        if (unclampedOutput < _minOutput) {
+            output = _minOutput;
+            _atMinOutput = true;
+            _atMaxOutput = false;
+        } else if (unclampedOutput > _maxOutput) {
+            output = _maxOutput;
+            _atMinOutput = false;
+            _atMaxOutput = true;
         } else {
             output = unclampedOutput;
-            m_atMinOutput = false;
-            m_atMaxOutput = false;
+            _atMinOutput = false;
+            _atMaxOutput = false;
         }
 
-        m_saturationError = unclampedOutput - output;
+        _saturationError = unclampedOutput - output;
 
         return output;
     }
 
     private double getOutput() {
-        return m_output;
+        return _output;
     }
 
     @Override
@@ -319,9 +359,9 @@ public class CoupledPIDController extends SendableBase implements Controller {
 
     @Override
     public void disable() {
-        m_totalError = 0;
-        m_integratedError = 0;
-        m_prevError = 0;
+        _totalError = 0;
+        _integratedError = 0;
+        _prevError = 0;
     }
 
 
@@ -351,12 +391,12 @@ public class CoupledPIDController extends SendableBase implements Controller {
      * @return
      */
     public double getContinuousError(double error) {
-        if (m_continuous && m_inputRange > 0) {
-            while (Math.abs(error) > (m_maxInput - m_minInput) / 2) {
+        if (_continuous && _inputRange > 0) {
+            while (Math.abs(error) > (_maxInput - _minInput) / 2) {
                 if (error > 0) {
-                    error -= m_maxInput - m_minInput;
+                    error -= _maxInput - _minInput;
                 } else {
-                    error += m_maxInput - m_minInput;
+                    error += _maxInput - _minInput;
                 }
 
             }

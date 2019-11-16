@@ -5,7 +5,7 @@ package frc.team2485.WarlordsLib.control;
  * @author Ian Lillie
  * @author Mark Rifkin
  */
-public class QuadraticRampRate implements Processor {
+public class QuadraticRampRate implements ControlElement {
 
     private double lastValue;
     private double upRampRateA, upRampRateB, downRampRateA, downRampRateB;
