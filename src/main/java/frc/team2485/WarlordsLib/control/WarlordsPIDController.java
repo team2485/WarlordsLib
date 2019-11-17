@@ -1,5 +1,6 @@
 package frc.team2485.WarlordsLib.control;
 
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -10,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @author Jeremy McCulloch
  * @author Nathan Sariowan
  */
-public class CoupledPIDController extends SendableBase implements Controller {
+public class WarlordsPIDController extends SendableBase implements Controller {
 
     /**
      * Default period for WPILib is 20 milliseconds.
@@ -114,17 +115,21 @@ public class CoupledPIDController extends SendableBase implements Controller {
     private boolean _atMaxOutput;
 
     /**
+     * Couples P term with I and D if true
+     */
+    private boolean _couplePID = true;
+
+    /**
      * Last recorded output
      */
     private double _output;
 
-    public CoupledPIDController(double P, double I, double D) {
+    public WarlordsPIDController(double P, double I, double D) {
         setPID(P, I, D);
         this._period = DEFAULT_PERIOD;
     }
 
-
-    public CoupledPIDController(double P, double I, double D, double period) {
+    public WarlordsPIDController(double P, double I, double D, double period) {
         setPID(P, I, D);
         _period = period;
     }
@@ -220,6 +225,14 @@ public class CoupledPIDController extends SendableBase implements Controller {
         this._kI = I;
         this._kD = D;
         this._kF = F;
+    }
+
+    public void setCoupled(double coupled) {
+        this._couplePID = true;
+    }
+
+    public boolean isCoupledPID() {
+        return this._couplePID;
     }
 
     /**
@@ -322,7 +335,15 @@ public class CoupledPIDController extends SendableBase implements Controller {
             iTerm = _kI * _totalError;
         }
 
-        double dTerm = _kD * _kP * ((_error - _prevError) / _period);
+        if (_couplePID) {
+            iTerm *= _kP;
+        }
+
+        double dTerm = _kD * ((_error - _prevError) / _period);
+
+        if (_couplePID) {
+            dTerm *= _kP;
+        }
 
         double unclampedOutput = pTerm + iTerm + dTerm + addTerm;
 
@@ -373,12 +394,6 @@ public class CoupledPIDController extends SendableBase implements Controller {
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("t", this::getT, this::setT);
-
-        builder.getEntry("p").setPersistent();
-        builder.getEntry("i").setPersistent();
-        builder.getEntry("d").setPersistent();
-        builder.getEntry("f").setPersistent();
-        builder.getEntry("t").setPersistent();
 
         builder.addDoubleProperty("output", this::getOutput, null);
         builder.setSafeState(this::disable);
