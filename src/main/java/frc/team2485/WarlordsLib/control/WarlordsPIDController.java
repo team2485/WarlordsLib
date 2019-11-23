@@ -124,6 +124,11 @@ public class WarlordsPIDController extends SendableBase implements Controller {
      */
     private double _output;
 
+    public WarlordsPIDController() {
+        setPID(0,0,0);
+        this._period = DEFAULT_PERIOD;
+    }
+
     public WarlordsPIDController(double P, double I, double D) {
         setPID(P, I, D);
         this._period = DEFAULT_PERIOD;

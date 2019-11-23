@@ -66,7 +66,7 @@ public class RobotConfigsMap {
                 return Double.parseDouble(get(category, key).trim());
             } catch (NumberFormatException e) {
                 reportWarning(category, key, Double.toString(backup), " Unable to parse into double");
-                e.printStackTrace();
+//                e.printStackTrace();
                 return backup;
             }
         }
@@ -80,7 +80,7 @@ public class RobotConfigsMap {
                 return Integer.parseInt(get(category, key).trim());
             } catch (NumberFormatException e) {
                 reportWarning(category, key, Double.toString(backup), " Unable to parse into int");
-                e.printStackTrace();
+//                e.printStackTrace();
                 return backup;
             }
         }
@@ -100,7 +100,7 @@ public class RobotConfigsMap {
                 return Boolean.parseBoolean(get(category, key).trim());
             } catch (NumberFormatException e) {
                 reportWarning(category, key, Boolean.toString(backup), " Unable to parse into boolean");
-                e.printStackTrace();
+//                e.printStackTrace();
                 return backup;
             }
         }
@@ -120,7 +120,7 @@ public class RobotConfigsMap {
                 return Float.parseFloat(get(category, key).trim());
             } catch (NumberFormatException e) {
                 reportWarning(category, key, Float.toString(backup), " Unable to parse into float");
-                e.printStackTrace();
+//                e.printStackTrace();
                 return backup;
             }
         }
@@ -140,7 +140,7 @@ public class RobotConfigsMap {
                 return Long.parseLong(get(category, key).trim());
             } catch (NumberFormatException e) {
                 reportWarning(category, key, Long.toString(backup), " Unable to parse into long");
-                e.printStackTrace();
+//                e.printStackTrace();
                 return backup;
             }
         }
