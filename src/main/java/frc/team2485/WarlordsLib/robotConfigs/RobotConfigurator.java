@@ -6,6 +6,7 @@ import java.io.*;
 
 /**
  * Singleton for saving robot configs/constants locally on roborio. Replaces ConstantsIO.
+ *
  * @author Nathan Sariowan
  */
 public class RobotConfigurator {
@@ -18,13 +19,14 @@ public class RobotConfigurator {
 
     /**
      * Instantiates RobotConfigurator singleton. Does NOT load configs from file; please use {@link #loadConfigsFromFile(String)}
+     *
      * @return Singleton instance of RobotConfigurator
      */
     public static RobotConfigurator getInstance() {
         if (_instance == null) {
-            synchronized(RobotConfigurator.class){
-                if (_instance ==null) {
-                    _instance =new RobotConfigurator();
+            synchronized (RobotConfigurator.class) {
+                if (_instance == null) {
+                    _instance = new RobotConfigurator();
                 }
             }
         }
@@ -41,20 +43,25 @@ public class RobotConfigurator {
 
     public void loadConfigsFromFile(String filepath, String separator) {
         _configs.clear();
-        if (new File(filepath).isFile()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
-                String row;
-                while ((row = reader.readLine()) != null) {
-                    String[] data = row.split(separator);
-                    if (data.length == 3) {
-                        _configs.put(data[0].trim(), data[1].trim(), data[2]);
-                    }
+        File file = new File(filepath);
+        try {
+            if (file.createNewFile()) {
+                DriverStation.reportWarning("Constants file not found! Creating new file at " + filepath, false);
+            };
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
+            String row;
+            while ((row = reader.readLine()) != null) {
+                String[] data = row.split(separator);
+                if (data.length == 3) {
+                    _configs.put(data[0].trim(), data[1].trim(), data[2]);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-        } else {
-            DriverStation.reportWarning("Constants file not found!", false);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -64,7 +71,7 @@ public class RobotConfigurator {
 
     public void saveConfigsToFile(String filepath, String separator) {
         try (FileWriter writer = new FileWriter(filepath)) {
-            for(String category : _configs.keySet()) {
+            for (String category : _configs.keySet()) {
                 for (String key : _configs.keySet(category)) {
                     if (_configs.containsKey(category, key)) {
                         writer.append(category);

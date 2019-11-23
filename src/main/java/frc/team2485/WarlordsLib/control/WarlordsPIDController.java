@@ -1,8 +1,10 @@
 package frc.team2485.WarlordsLib.control;
 
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team2485.WarlordsLib.robotConfigs.RobotConfigurator;
+import frc.team2485.WarlordsLib.robotConfigs.SaveableBase;
 
 /**
  * PID Controller based mainly on Jeremy McCulloch's PIDController.
@@ -11,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @author Jeremy McCulloch
  * @author Nathan Sariowan
  */
-public class WarlordsPIDController extends SendableBase implements Controller {
+public class WarlordsPIDController extends SaveableBase implements Controller {
 
     /**
      * Default period for WPILib is 20 milliseconds.
@@ -26,17 +28,17 @@ public class WarlordsPIDController extends SendableBase implements Controller {
     /**
      * Proportional Term
      */
-    private double _kP;
+    private double _kP=0;
 
     /**
      * Integral Term
      */
-    private double _kI;
+    private double _kI=0;
 
     /**
      * Derivative Term
      */
-    private double _kD;
+    private double _kD=0;
 
     
     /**
@@ -47,7 +49,7 @@ public class WarlordsPIDController extends SendableBase implements Controller {
     /**
      * Integral anti-windup constant; multiplied by saturation error.
      */
-    private double m_kT = 0;
+    private double m_kAW = 0;
 
     /**
      * Set true if the max value of the system is equal to the min (endpoints wrap around)
@@ -58,6 +60,7 @@ public class WarlordsPIDController extends SendableBase implements Controller {
      * Min measurement input
      */
     private double _minInput;
+
 
     /**
      * Max measurement input
@@ -125,18 +128,29 @@ public class WarlordsPIDController extends SendableBase implements Controller {
     private double _output;
 
     public WarlordsPIDController() {
-        setPID(0,0,0);
         this._period = DEFAULT_PERIOD;
     }
 
-    public WarlordsPIDController(double P, double I, double D) {
-        setPID(P, I, D);
-        this._period = DEFAULT_PERIOD;
+    public WarlordsPIDController(double period) {
+        this._period = period;
     }
 
-    public WarlordsPIDController(double P, double I, double D, double period) {
-        setPID(P, I, D);
-        _period = period;
+
+    public WarlordsPIDController(String categoryName, boolean useRobotConfigs) {
+        super(categoryName, useRobotConfigs);
+        System.out.println("Initialized");
+        if (useRobotConfigs) {
+            setP(RobotConfigurator.getInstance().getDouble(categoryName, "p", 0));
+            setI(RobotConfigurator.getInstance().getDouble(categoryName, "i", 0));
+            setD(RobotConfigurator.getInstance().getDouble(categoryName, "d", 0));
+            setF(RobotConfigurator.getInstance().getDouble(categoryName, "f", 0));
+            setAW(RobotConfigurator.getInstance().getDouble(categoryName, "aw", 0));
+        }
+    }
+
+    public WarlordsPIDController(String categoryName, boolean useRobotConfig, double period) {
+        this(categoryName, useRobotConfig);
+        this._period = period;
     }
 
     /**
@@ -156,10 +170,12 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
     /**
      * Set proportional constant
-     * @param P proportional constant
+     * @param p proportional constant
      */
-    public void setP(double P) {
-        this._kP = P;
+    public void setP(double p) {
+        System.out.println("SET P TO " + p );
+        this._kP = p;
+        this.saveConstant("p", p);
     }
 
     /**
@@ -172,10 +188,11 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
     /**
      * Set integral constant
-     * @param I integral constant
+     * @param i integral constant
      */
-    public void setI(double I) {
-        this._kI = I;
+    public void setI(double i) {
+        this._kI = i;
+        this.saveConstant("i", i);
     }
 
     /**
@@ -188,10 +205,11 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
     /**
      * Set derivative constant
-     * @param D derivative constant
+     * @param d derivative constant
      */
-    public void setD(double D) {
-        this._kP = D;
+    public void setD(double d) {
+        this._kD = d;
+        this.saveConstant("d", d);
     }
 
     /**
@@ -202,38 +220,44 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
     /**
      * Set feed forward constant
-     * @param F
+     * @param f
      */
-    public void setF(double F) { this._kF = F; }
+    public void setF(double f) {
+        this._kF = f;
+        this.saveConstant("f", f);
+    }
 
     /**
      * Get integral anti-windup constant
-     * @return Kt constant
+     * @return kAW constant
      */
-    public double getT() { return this.m_kT; }
+    public double getAW() { return this.m_kAW; }
 
     /**
      * Set integral anti-windup constant, which is multiplied by the saturation error
-     * @param T Kt constant
+     * @param aw Kt constant
      */
-    public void setT(double T) { this. m_kT = T; }
-
-
-    public void setPID(double P, double I, double D) {
-        this._kP = P;
-        this._kI = I;
-        this._kD = D;
+    public void setAW(double aw) {
+        this.m_kAW = aw;
+        this.saveConstant("aw", aw);
     }
 
-    public void setPIDF(double P, double I, double D, double F) {
-        this._kP = P;
-        this._kI = I;
-        this._kD = D;
-        this._kF = F;
+
+    public void setPID(double p, double i, double d) {
+        this.setP(p);
+        this.setI(i);
+        this.setD(d);
     }
 
-    public void setCoupled(double coupled) {
-        this._couplePID = true;
+    public void setPIDF(double p, double i, double d, double f) {
+        this.setP(p);
+        this.setI(i);
+        this.setD(d);
+        this.setF(f);
+    }
+
+    public void setCoupled(boolean coupled) {
+        this._couplePID = coupled;
     }
 
     public boolean isCoupledPID() {
@@ -333,7 +357,7 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
         // Anti-windup logic: reduce integral error by a constant if saturating
         if (_atMaxOutput || _atMinOutput) {
-            iTerm = _kI * (_totalError - m_kT * _saturationError);
+            iTerm = _kI * (_totalError - m_kAW * _saturationError);
         } else {
             //A temp integrated error for other anti-windup logic schemes in the future
             _integratedError += _error * _period;
@@ -352,6 +376,12 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
         double unclampedOutput = pTerm + iTerm + dTerm + addTerm;
 
+
+        SmartDashboard.putNumber("p", pTerm);
+        SmartDashboard.putNumber("i", iTerm);
+
+        SmartDashboard.putNumber("d", dTerm);
+
         double output = 0;
 
         // Clamp output
@@ -368,6 +398,9 @@ public class WarlordsPIDController extends SendableBase implements Controller {
             _atMinOutput = false;
             _atMaxOutput = false;
         }
+
+
+        SmartDashboard.putNumber("d", output);
 
         _saturationError = unclampedOutput - output;
 
@@ -393,16 +426,17 @@ public class WarlordsPIDController extends SendableBase implements Controller {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("WL_PIDController");
-        builder.addDoubleProperty("p", this::getP, this::setP);
-        builder.addDoubleProperty("i", this::getI, this::setI);
-        builder.addDoubleProperty("d", this::getD, this::setD);
-        builder.addDoubleProperty("f", this::getF, this::setF);
-        builder.addDoubleProperty("t", this::getT, this::setT);
+        builder.setSmartDashboardType("WarlordsPIDController");
 
         builder.addDoubleProperty("output", this::getOutput, null);
-        builder.setSafeState(this::disable);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.setSafeState(this::disable);
+
+        builder.addDoubleProperty("P Term", this::getP, this::setP);
+        builder.addDoubleProperty("I Term", this::getI, this::setI);
+        builder.addDoubleProperty("D Term", this::getD, this::setD);
+        builder.addDoubleProperty("F Term", this::getF, this::setF);
+        builder.addDoubleProperty("AW Term", this::getAW, this::setAW);
     }
 
     /**
