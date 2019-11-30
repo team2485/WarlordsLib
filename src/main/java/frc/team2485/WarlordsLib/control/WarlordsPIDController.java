@@ -1,8 +1,6 @@
 package frc.team2485.WarlordsLib.control;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2485.WarlordsLib.robotConfigs.RobotConfigurator;
 import frc.team2485.WarlordsLib.robotConfigs.SaveableBase;
 
@@ -23,7 +21,7 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
     /**
      * Rate in seconds that the PID Controller runs at.
      */
-    private double _period;
+    private double _period = DEFAULT_PERIOD;
 
     /**
      * Proportional Term
@@ -125,7 +123,9 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
     /**
      * Last recorded output
      */
-    private double _output;
+    private double _lastOutput;
+
+    private double _lastMeasurement;
 
     public WarlordsPIDController() {
         this._period = DEFAULT_PERIOD;
@@ -138,7 +138,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
 
     public WarlordsPIDController(String categoryName, boolean useRobotConfigs) {
         super(categoryName, useRobotConfigs);
-        System.out.println("Initialized");
         if (useRobotConfigs) {
             setP(RobotConfigurator.getInstance().getDouble(categoryName, "p", 0));
             setI(RobotConfigurator.getInstance().getDouble(categoryName, "i", 0));
@@ -146,6 +145,7 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
             setF(RobotConfigurator.getInstance().getDouble(categoryName, "f", 0));
             setAW(RobotConfigurator.getInstance().getDouble(categoryName, "aw", 0));
         }
+        this._period = DEFAULT_PERIOD;
     }
 
     public WarlordsPIDController(String categoryName, boolean useRobotConfig, double period) {
@@ -173,7 +173,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
      * @param p proportional constant
      */
     public void setP(double p) {
-        System.out.println("SET P TO " + p );
         this._kP = p;
         this.saveConstant("p", p);
     }
@@ -376,12 +375,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
 
         double unclampedOutput = pTerm + iTerm + dTerm + addTerm;
 
-
-        SmartDashboard.putNumber("p", pTerm);
-        SmartDashboard.putNumber("i", iTerm);
-
-        SmartDashboard.putNumber("d", dTerm);
-
         double output = 0;
 
         // Clamp output
@@ -399,16 +392,19 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
             _atMaxOutput = false;
         }
 
-
-        SmartDashboard.putNumber("d", output);
-
         _saturationError = unclampedOutput - output;
+
+        this._lastOutput = output;
 
         return output;
     }
 
     private double getOutput() {
-        return _output;
+        return _lastOutput;
+    }
+
+    private double getMeasurement() {
+        return _lastMeasurement;
     }
 
     @Override
@@ -416,11 +412,14 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
         return calculate(input, 0);
     }
 
-    @Override
     public void disable() {
         _totalError = 0;
         _integratedError = 0;
         _prevError = 0;
+    }
+
+    public void reset() {
+        disable();
     }
 
 
@@ -428,7 +427,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("WarlordsPIDController");
 
-        builder.addDoubleProperty("output", this::getOutput, null);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
         builder.setSafeState(this::disable);
 
@@ -437,6 +435,9 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
         builder.addDoubleProperty("D Term", this::getD, this::setD);
         builder.addDoubleProperty("F Term", this::getF, this::setF);
         builder.addDoubleProperty("AW Term", this::getAW, this::setAW);
+
+
+        builder.addDoubleProperty("Output", this::getOutput, null);
     }
 
     /**
