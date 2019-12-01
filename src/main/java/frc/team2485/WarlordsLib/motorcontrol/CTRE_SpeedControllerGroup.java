@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib;
+package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Kinda copied from WPI's except with Control Modes
  */
 public class CTRE_SpeedControllerGroup extends SendableBase implements SpeedController {
-    private boolean m_isInverted;
+    private boolean m_isInverted = false;
     private final BaseMotorController[] m_speedControllers;
     private static int instances;
 
@@ -45,14 +45,14 @@ public class CTRE_SpeedControllerGroup extends SendableBase implements SpeedCont
     }
 
     @Override
-    public void set(double speed) {
+    public void set(double speed) {;
         this.set(m_defaultControlMode, speed);
     }
 
     public void set(ControlMode controlMode, double speed) {
         m_output =  m_isInverted ? -speed : speed;
         for (BaseMotorController controller : m_speedControllers) {
-            controller.set(controlMode, m_isInverted ? -speed : speed);
+            controller.set(controlMode, m_output);
         }
     }
 
