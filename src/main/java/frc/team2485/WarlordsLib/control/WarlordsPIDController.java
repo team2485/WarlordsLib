@@ -425,7 +425,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("WarlordsPIDController");
 
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
         builder.setSafeState(this::disable);
