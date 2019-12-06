@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib.motorcontrol.vendor;
+package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.MotorSafety;

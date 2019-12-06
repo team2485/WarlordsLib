@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib.motorcontrol.vendor;
+package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
