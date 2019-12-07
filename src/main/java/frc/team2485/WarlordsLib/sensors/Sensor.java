@@ -1,8 +1,8 @@
 package frc.team2485.WarlordsLib.sensors;
 
-public interface SensorWrapper {
+public interface Sensor {
 
     double getPosition();
 
-    double getVelocitiy();
+    double getVelocity();
 }

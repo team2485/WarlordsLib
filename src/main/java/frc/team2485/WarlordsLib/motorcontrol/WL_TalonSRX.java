@@ -17,6 +17,12 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         super(deviceNumber);
     }
 
+    public WL_TalonSRX(int deviceNumber, boolean isInverted) {
+        super(deviceNumber);
+        this.setInverted(isInverted);
+    }
+
+
     public void setFollowers(BaseMotorController slave, BaseMotorController... slaves) {
         slave.follow(this);
         for (BaseMotorController m : slaves) {
