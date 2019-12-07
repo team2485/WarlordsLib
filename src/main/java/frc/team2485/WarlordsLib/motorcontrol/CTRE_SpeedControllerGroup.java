@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Kinda copied from WPI's except with Control Modes
+ * @deprecated
  */
 public class CTRE_SpeedControllerGroup extends SendableBase implements SpeedController {
     private boolean m_isInverted = false;
