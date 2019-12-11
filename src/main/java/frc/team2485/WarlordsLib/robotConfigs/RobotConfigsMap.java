@@ -51,6 +51,7 @@ public class RobotConfigsMap {
             return get(category,key);
         }
         reportWarningNotFound(category, key, backup);
+        put(category, key, backup);
         return backup;
     }
 
@@ -71,6 +72,7 @@ public class RobotConfigsMap {
             }
         }
         reportWarningNotFound(category, key, Double.toString(backup));
+        put(category, key, Double.toString(backup));
         return backup;
     }
 
@@ -79,12 +81,13 @@ public class RobotConfigsMap {
             try {
                 return Integer.parseInt(get(category, key).trim());
             } catch (NumberFormatException e) {
-                reportWarning(category, key, Double.toString(backup), " Unable to parse into int");
+                reportWarning(category, key, Integer.toString(backup), " Unable to parse into int");
 //                e.printStackTrace();
                 return backup;
             }
         }
         reportWarningNotFound(category, key, Integer.toString(backup));
+        put(category, key, Integer.toString(backup));
         return backup;
     }
 
@@ -105,6 +108,7 @@ public class RobotConfigsMap {
             }
         }
         reportWarningNotFound(category, key, Boolean.toString(backup));
+        put(category, key, Boolean.toString(backup));
         return backup;
     }
 
@@ -125,6 +129,7 @@ public class RobotConfigsMap {
             }
         }
         reportWarningNotFound(category, key, Float.toString(backup));
+        put(category, key, Float.toString(backup));
         return backup;
     }
 
@@ -145,6 +150,7 @@ public class RobotConfigsMap {
             }
         }
         reportWarningNotFound(category, key, Long.toString(backup));
+        put(category, key, Long.toString(backup));
         return backup;
     }
 
