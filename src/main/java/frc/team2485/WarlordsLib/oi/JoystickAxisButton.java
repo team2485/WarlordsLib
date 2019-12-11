@@ -1,7 +1,7 @@
 package frc.team2485.WarlordsLib.oi;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.frc2.buttons.Button;
+import edu.wpi.first.wpilibj2.command.button.Button;
 
 /**
  * Makes a joystick trigger like a button using a threshold.

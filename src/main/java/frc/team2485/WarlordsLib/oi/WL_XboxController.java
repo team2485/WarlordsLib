@@ -1,7 +1,7 @@
 package frc.team2485.WarlordsLib.oi;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.frc2.buttons.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * An XboxController with default deadbanding and a convenience function for getting JoystickButtons.
@@ -71,6 +71,26 @@ public class WL_XboxController extends XboxController {
      */
     public JoystickButton getJoystickButton(XboxButton button) {
         return getJoystickButton(button.value);
+    }
+
+    /**
+     * Returns JoystickAxisButton
+     * @param port port number of axis/joystick
+     * @param threshold threshold of JoystickAxis
+     * @return JoystickAxisButton
+     */
+    public JoystickAxisButton getJoystickAxisButton(int port, double threshold) {
+        return new JoystickAxisButton(this, port, threshold);
+    }
+
+    /**
+     * Returns JoystickAxisButton
+     * @param joystick XboxJoystick joystick axis
+     * @param threshold threshold of JoystickAxis
+     * @return JoystickAxisButton
+     */
+    public JoystickAxisButton getJoystickAxisButton(XboxJoystick joystick, double threshold) {
+        return getJoystickAxisButton(joystick.value, threshold);
     }
 
 }
