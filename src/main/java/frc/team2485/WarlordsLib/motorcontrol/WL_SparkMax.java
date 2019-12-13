@@ -13,6 +13,8 @@ public class WL_SparkMax extends WPI_SparkMax {
      */
     public WL_SparkMax(int deviceID, MotorType type) {
         super(deviceID, type);
+        this.restoreFactoryDefaults();
+        this.clearFaults();
     }
 
     public void setFollowers(CANSparkMax slave, CANSparkMax... slaves) {
