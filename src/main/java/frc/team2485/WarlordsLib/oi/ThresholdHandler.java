@@ -8,6 +8,8 @@ package frc.team2485.WarlordsLib.oi;
  * @author Anoushka Bose
  * @author Aidan Fay
  * @author Jeremy McCulloch
+ *
+ * @deprecated
  */
 public class ThresholdHandler {
 	
