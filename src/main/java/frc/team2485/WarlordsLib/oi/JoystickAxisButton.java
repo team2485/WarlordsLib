@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
  * @author Nathan Sariowan
  */
 public class JoystickAxisButton extends Button {
+
     private double _threshold;
     private GenericHID _joystick;
     private int _port;

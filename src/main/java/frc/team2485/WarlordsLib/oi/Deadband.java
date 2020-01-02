@@ -1,14 +1,14 @@
 package frc.team2485.WarlordsLib.oi;
 
 /**
- * Util class with general static methods for joystick deadbanding and scaling.
+ * Util class with general static methods for joystick deadbanding and scaling. Successor of ThresholdHandler
  *
  * @author Patrick Wamsley
  * @author Anoushka Bose
  * @author Aidan Fay
  * @author Jeremy McCulloch
  */
-public class Deadbander {
+public class Deadband {
 
     /**
      * Simple deadband with linear scale.

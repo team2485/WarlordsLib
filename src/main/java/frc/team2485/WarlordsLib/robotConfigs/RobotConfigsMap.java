@@ -9,35 +9,25 @@ import java.util.Set;
 /**
  * A custom 2d hashmap of constants for the robot. The first key is the category name (eg Subsystem name) and the second key is the constant name.
  */
-public class RobotConfigsMap {
-
-    private HashMap<String, HashMap<String,String>> _map;
-
-    public RobotConfigsMap() {
-        _map = new HashMap<>();
-    }
+public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
 
     public void put(String category, String key, String value) {
         key = key.trim();
-        if (_map.containsKey(category)) {
-            _map.get(category).put(key, value);
+        if (this.containsKey(category)) {
+            this.get(category).put(key, value);
         } else {
             HashMap<String, String> tempMap = new HashMap<String, String>();
             tempMap.put(key, value);
-;           _map.put(category, tempMap);
+;           this.put(category, tempMap);
         }
     }
 
     public String get(String category, String key) {
         key = key.trim();
         if (containsKey(category, key)) {
-            return _map.get(category).get(key);
+            return this.get(category).get(key);
         }
         return null;
-    }
-
-    public HashMap<String, String> get(String category) {
-        return _map.get(category);
     }
 
     /**
@@ -149,6 +139,7 @@ public class RobotConfigsMap {
                 return backup;
             }
         }
+
         reportWarningNotFound(category, key, Long.toString(backup));
         put(category, key, Long.toString(backup));
         return backup;
@@ -163,32 +154,16 @@ public class RobotConfigsMap {
     }
 
     public boolean containsKey(String category, String key) {
-        return _map.containsKey(category) && _map.get(category).containsKey(key);
+        return this.containsKey(category) && this.get(category).containsKey(key);
     }
 
     public boolean containsCategory(String category) {
-        return _map.containsKey(category);
-    }
-
-    public void clear() {
-        _map.clear();
-    }
-
-    public int size() {
-        return _map.size();
-    }
-
-    public Set<Map.Entry<String, HashMap<String, String>>> entrySet() {
-        return _map.entrySet();
-    }
-
-    public Set<String> keySet() {
-        return _map.keySet();
+        return this.containsKey(category);
     }
 
     public Set<String> keySet(String category) {
-        if (_map.containsKey(category)) {
-            return _map.get(category).keySet();
+        if (this.containsKey(category)) {
+            return this.get(category).keySet();
         }
         return null;
     }

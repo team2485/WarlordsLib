@@ -6,6 +6,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
+/**
+ * Warlords wrapper for TalonSRX with convenience functions.
+ */
 public class WL_TalonSRX extends WPI_TalonSRX {
 
     /**
@@ -19,10 +22,13 @@ public class WL_TalonSRX extends WPI_TalonSRX {
 
     public WL_TalonSRX(int deviceNumber, boolean isInverted) {
         super(deviceNumber);
+        this.configFactoryDefault();
         this.setInverted(isInverted);
     }
 
-
+    /**
+     * The given motor controllers will now follow this motor controller.
+     */
     public void setFollowers(BaseMotorController slave, BaseMotorController... slaves) {
         slave.follow(this);
         for (BaseMotorController m : slaves) {
@@ -30,6 +36,13 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         }
     }
 
+    /**
+     *
+     * @param peakCurrentLimit Peak current limit
+     * @param peakCurrentDuration Peak current limit duration (milliseconds)
+     * @param continuousCurrentLimit Continuous current limit
+     * @param currentLimitsEnabled Enable state of current limit.
+     */
     public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit, boolean currentLimitsEnabled) {
         this.configPeakCurrentLimit(peakCurrentLimit);
         this.configPeakCurrentDuration(peakCurrentDuration);
@@ -37,7 +50,7 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         this.enableCurrentLimit(currentLimitsEnabled);
     }
 
-
-
-
+    public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit) {
+        setCurrentLimiting(peakCurrentLimit, peakCurrentDuration, continuousCurrentLimit, true);
+    }
 }
