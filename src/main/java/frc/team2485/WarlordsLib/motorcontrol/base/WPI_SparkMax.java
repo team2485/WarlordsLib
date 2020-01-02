@@ -1,17 +1,17 @@
-package frc.team2485.WarlordsLib.motorcontrol;
+package frc.team2485.WarlordsLib.motorcontrol.base;
 
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.hal.FRCNetComm;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
+/**
+ * Basic wrapper for a CAN SparkMax implementing SpeedController and Sendable.
+ */
 public class WPI_SparkMax extends CANSparkMax implements SpeedController, Sendable {
-
-    private String _name = "";
-    private String _subsystem = "Ungrouped";
-
 
     /**
      * Create a new SPARK MAX Controller
@@ -24,38 +24,8 @@ public class WPI_SparkMax extends CANSparkMax implements SpeedController, Sendab
     public WPI_SparkMax(int deviceID, MotorType type) {
         super(deviceID, type);
 
-        LiveWindow.add(this);
-        setName("Spark Max " + deviceID);
-    }
-
-    /**
-     * Add a child component.
-     *
-     * @param child
-     *            child component
-     */
-    protected final void addChild(Object child) {
-        LiveWindow.addChild(this, child);
-    }
-
-    @Override
-    public String getName() {
-        return this._name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this._name = name;
-    }
-
-    @Override
-    public String getSubsystem() {
-        return this._subsystem;
-    }
-
-    @Override
-    public void setSubsystem(String subsystem) {
-        this._subsystem = subsystem;
+        HAL.report(FRCNetComm.tResourceType.kResourceType_RevSparkMaxCAN, deviceID + 1);
+        SendableRegistry.addLW(this, "Spark Max", deviceID);
     }
 
     @Override

@@ -1,17 +1,18 @@
 package frc.team2485.WarlordsLib.control;
 
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import frc.team2485.WarlordsLib.robotConfigs.RobotConfigurator;
-import frc.team2485.WarlordsLib.robotConfigs.SaveableBase;
+import frc.team2485.WarlordsLib.robotConfigs.Configurable;
+import frc.team2485.WarlordsLib.robotConfigs.ConfigurableBuilder;
 
 /**
  * PID Controller based mainly on Jeremy McCulloch's PIDController.
- * Takes some ideas from WPILib's WL_PIDController.
+ * Takes some ideas from WPILib's CoupledPIDController.
  *
  * @author Jeremy McCulloch
  * @author Nathan Sariowan
  */
-public class WarlordsPIDController extends SaveableBase implements Controller {
+public class WarlordsPIDController implements Configurable, Sendable {
 
     /**
      * Default period for WPILib is 20 milliseconds.
@@ -127,30 +128,12 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
 
     private double _lastMeasurement;
 
-    public WarlordsPIDController() {
-        this._period = DEFAULT_PERIOD;
-    }
-
     public WarlordsPIDController(double period) {
         this._period = period;
     }
 
-
-    public WarlordsPIDController(String categoryName, boolean useRobotConfigs) {
-        super(categoryName, useRobotConfigs);
-        if (useRobotConfigs) {
-            setP(RobotConfigurator.getInstance().getDouble(categoryName, "p", 0));
-            setI(RobotConfigurator.getInstance().getDouble(categoryName, "i", 0));
-            setD(RobotConfigurator.getInstance().getDouble(categoryName, "d", 0));
-            setF(RobotConfigurator.getInstance().getDouble(categoryName, "f", 0));
-            setAW(RobotConfigurator.getInstance().getDouble(categoryName, "aw", 0));
-        }
+    public WarlordsPIDController() {
         this._period = DEFAULT_PERIOD;
-    }
-
-    public WarlordsPIDController(String categoryName, boolean useRobotConfig, double period) {
-        this(categoryName, useRobotConfig);
-        this._period = period;
     }
 
     /**
@@ -174,7 +157,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
      */
     public void setP(double p) {
         this._kP = p;
-        this.saveConstant("p", p);
     }
 
     /**
@@ -191,7 +173,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
      */
     public void setI(double i) {
         this._kI = i;
-        this.saveConstant("i", i);
     }
 
     /**
@@ -208,7 +189,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
      */
     public void setD(double d) {
         this._kD = d;
-        this.saveConstant("d", d);
     }
 
     /**
@@ -223,7 +203,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
      */
     public void setF(double f) {
         this._kF = f;
-        this.saveConstant("f", f);
     }
 
     /**
@@ -238,7 +217,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
      */
     public void setAW(double aw) {
         this.m_kAW = aw;
-        this.saveConstant("aw", aw);
     }
 
 
@@ -407,7 +385,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
         return _lastMeasurement;
     }
 
-    @Override
     public double calculate(double input) {
         return calculate(input, 0);
     }
@@ -422,7 +399,6 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
         disable();
     }
 
-
     @Override
     public void initSendable(SendableBuilder builder) {
 
@@ -434,10 +410,18 @@ public class WarlordsPIDController extends SaveableBase implements Controller {
         builder.addDoubleProperty("D Term", this::getD, this::setD);
         builder.addDoubleProperty("F Term", this::getF, this::setF);
         builder.addDoubleProperty("AW Term", this::getAW, this::setAW);
-
-
         builder.addDoubleProperty("Output", this::getOutput, null);
     }
+
+    @Override
+    public void initConfigurable(ConfigurableBuilder builder) {
+        builder.addDoubleProperty("p", this::getP, this::setP);
+        builder.addDoubleProperty("i", this::getI, this::setI);
+        builder.addDoubleProperty("d", this::getD, this::setD);
+        builder.addDoubleProperty("f", this::getF, this::setF);
+        builder.addDoubleProperty("aw", this::getAW, this::setAW);
+    }
+
 
     /**
      * Gets difference of measurement and setpoint.

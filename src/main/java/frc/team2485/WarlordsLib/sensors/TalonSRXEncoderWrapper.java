@@ -2,7 +2,6 @@ package frc.team2485.WarlordsLib.sensors;
 
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Encoder;
 
 /**
  * Copied from previous year; @todo look at available SensorCollection methods

@@ -1,7 +1,13 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
+import com.ctre.phoenix.motorcontrol.IMotorController;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.revrobotics.CANSparkMax;
+import frc.team2485.WarlordsLib.motorcontrol.base.WPI_SparkMax;
 
+/**
+ * Warlords wrapper for Spark Max with convenience functions.
+ */
 public class WL_SparkMax extends WPI_SparkMax {
 
     /**
@@ -14,10 +20,9 @@ public class WL_SparkMax extends WPI_SparkMax {
     public WL_SparkMax(int deviceID, MotorType type) {
         super(deviceID, type);
         this.restoreFactoryDefaults();
-        this.clearFaults();
     }
 
-    public void setFollowers(CANSparkMax slave, CANSparkMax... slaves) {
+    public void setFollowers(WL_SparkMax slave, WL_SparkMax... slaves) {
         slave.follow(this);
         for (CANSparkMax m : slaves) {
             m.follow(this);
