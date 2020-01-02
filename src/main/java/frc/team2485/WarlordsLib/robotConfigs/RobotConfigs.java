@@ -1,44 +1,66 @@
 package frc.team2485.WarlordsLib.robotConfigs;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Singleton for saving robot configs/constants locally on roborio. Replaces ConstantsIO.
  *
- * @author Nathan Sariowan
+ * Call me by using RobotConfigs.getInstance()
  */
-public class RobotConfigurator {
+public class RobotConfigs {
 
-    private static volatile RobotConfigurator _instance;
+    private static volatile RobotConfigs _instance;
 
     private RobotConfigsMap _configs;
 
-    private static final String DEFAULT_SEPARATOR = ",";
+    private ConfigurableRegistry _configurableRegistry;
+
+    private static final String DEFAULT_CSV_SEPARATOR = ",";
+
+    private boolean _loaded;
 
     /**
-     * Instantiates RobotConfigurator singleton. Does NOT load configs from file; please use {@link #loadConfigsFromFile(String)}
+     * Instantiates RobotConfigs singleton. Does NOT load configs from file; please use {@link #loadConfigsFromFile(String)}
      *
-     * @return Singleton instance of RobotConfigurator
+     * @return Singleton instance of RobotConfigs
      */
-    public static RobotConfigurator getInstance() {
+    public static RobotConfigs getInstance() {
         if (_instance == null) {
-            synchronized (RobotConfigurator.class) {
+            synchronized (RobotConfigs.class) {
                 if (_instance == null) {
-                    _instance = new RobotConfigurator();
+                    _instance = new RobotConfigs();
                 }
             }
         }
         return _instance;
     }
 
-    private RobotConfigurator() {
+    private RobotConfigs() {
         _configs = new RobotConfigsMap();
+        _configurableRegistry = new ConfigurableRegistry();
+        _loaded = false;
     }
 
+    private boolean configsLoadedFromFile() {
+        return this._loaded;
+    }
+
+    private void setConfigsLoadedFromFile(boolean loaded) {
+        this._loaded = loaded;
+    }
+
+    /**
+     * It is recommended to run this BEFORE running RobotContainer so it may access loaded values!
+     * @param filepath the location of the file
+     */
     public void loadConfigsFromFile(String filepath) {
-        loadConfigsFromFile(filepath, DEFAULT_SEPARATOR);
+        loadConfigsFromFile(filepath, DEFAULT_CSV_SEPARATOR);
     }
 
     public void loadConfigsFromFile(String filepath, String separator) {
@@ -47,7 +69,7 @@ public class RobotConfigurator {
         try {
             if (file.createNewFile()) {
                 DriverStation.reportWarning("Constants file not found! Creating new file at " + filepath, false);
-            };
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,16 +82,22 @@ public class RobotConfigurator {
                     _configs.put(data[0].trim(), data[1].trim(), data[2]);
                 }
             }
+            setConfigsLoadedFromFile(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        _configurableRegistry.updateAll();
     }
 
     public void saveConfigsToFile(String filepath) {
-        saveConfigsToFile(filepath, DEFAULT_SEPARATOR);
+        saveConfigsToFile(filepath, DEFAULT_CSV_SEPARATOR);
     }
 
     public void saveConfigsToFile(String filepath, String separator) {
+
+        _configurableRegistry.saveAll();
+
         try (FileWriter writer = new FileWriter(filepath)) {
             for (String category : _configs.keySet()) {
                 for (String key : _configs.keySet(category)) {
@@ -92,27 +120,39 @@ public class RobotConfigurator {
     }
 
     public String getString(String category, String key, String backup) {
+        checkConfigsLoaded();
         return _configs.getStringOrBackup(category, key, backup);
     }
 
     public double getDouble(String category, String key, double backup) {
+        checkConfigsLoaded();
         return _configs.getDoubleOrBackup(category, key, backup);
     }
 
     public int getInt(String category, String key, int backup) {
+        checkConfigsLoaded();
         return _configs.getIntOrBackup(category, key, backup);
     }
 
     public float getFloat(String category, String key, float backup) {
+        checkConfigsLoaded();
         return _configs.getFloatOrBackup(category, key, backup);
     }
 
     public long getLong(String category, String key, long backup) {
+        checkConfigsLoaded();
         return _configs.getLongOrBackup(category, key, backup);
     }
 
     public boolean getBoolean(String category, String key, boolean backup) {
+        checkConfigsLoaded();
         return _configs.getBooleanOrBackup(category, key, backup);
+    }
+
+    private void checkConfigsLoaded() {
+        if (!configsLoadedFromFile()) {
+            DriverStation.reportWarning("RobotConfigs has not loaded a file yet, so no constants have been loaded. Make sure to run method loadConfigsFromFile!", true);
+        }
     }
 
     public void put(String category, String key, String value) {
@@ -137,6 +177,40 @@ public class RobotConfigurator {
 
     public void put(String category, String key, boolean value) {
         _configs.put(category, key, Boolean.toString(value));
+    }
+
+    public void addConfigurable(String category, Configurable configurable) {
+        _configurableRegistry.addConfigurable(category, configurable);
+    }
+
+    /**
+     * Registry of all Configurables.
+     */
+    private class ConfigurableRegistry {
+
+        private WeakHashMap<String, ConfigurableBuilderImpl> _configurableBuilders;
+
+        private ConfigurableRegistry() {
+            _configurableBuilders = new WeakHashMap<>();
+        }
+
+        private void addConfigurable(String category, Configurable configurable) {
+            ConfigurableBuilderImpl c = new ConfigurableBuilderImpl();
+            configurable.initConfigurable(c);
+            _configurableBuilders.put(category, c);
+            c.updateAll(category);
+        }
+
+        private void updateAll() {
+            for (Map.Entry<String, ConfigurableBuilderImpl> entry : _configurableBuilders.entrySet()) {
+                entry.getValue().updateAll(entry.getKey());
+            }
+        }
+        private void saveAll() {
+            for (Map.Entry<String, ConfigurableBuilderImpl> entry : _configurableBuilders.entrySet()) {
+                entry.getValue().saveAll(entry.getKey());
+            }
+        }
     }
 
 }
