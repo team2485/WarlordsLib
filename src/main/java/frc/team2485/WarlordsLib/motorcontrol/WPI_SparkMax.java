@@ -28,7 +28,35 @@ public class WPI_SparkMax extends CANSparkMax implements SpeedController, Sendab
         setName("Spark Max " + deviceID);
     }
 
+    /**
+     * Add a child component.
+     *
+     * @param child
+     *            child component
+     */
+    protected final void addChild(Object child) {
+        LiveWindow.addChild(this, child);
+    }
 
+    @Override
+    public String getName() {
+        return this._name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this._name = name;
+    }
+
+    @Override
+    public String getSubsystem() {
+        return this._subsystem;
+    }
+
+    @Override
+    public void setSubsystem(String subsystem) {
+        this._subsystem = subsystem;
+    }
 
     @Override
     public void initSendable(SendableBuilder builder) {
