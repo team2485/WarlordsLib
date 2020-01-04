@@ -3,10 +3,6 @@ package frc.team2485.WarlordsLib.oi;
 /**
  * Util class with general static methods for joystick deadbanding and scaling. Successor of ThresholdHandler
  *
- * @author Patrick Wamsley
- * @author Anoushka Bose
- * @author Aidan Fay
- * @author Jeremy McCulloch
  */
 public class Deadband {
 
@@ -22,7 +18,41 @@ public class Deadband {
 
         double returnVal = (1 / (1 - threshold)) * (Math.abs(value) - threshold);
 
-        return value > 0 ? returnVal : -returnVal;
+        return Math.copySign(returnVal, value);
+    }
+
+    /**
+     * Square scaling of input
+     * @param value input value from joystick/controller
+     * @param weight weight of square (lower the weight, wider the curve)
+     * @return quadratically scaled input
+     */
+    public static double squareScale(double value, double weight) {
+        return Math.copySign(weight * value * value, value);
+    }
+
+    /**
+     * Square scaling of input (default weight of 1)
+     * @param value input value from joystick/controller
+     * @return square scaled input
+     */
+    public static double squareScale(double value) {
+        return squareScale(value, 1.0);
+    }
+
+    /**
+     * Thresholds and scales quadratically
+     * @param value input value from joystick/controller
+     * @param threshold deadband threshold. Values below this threshold are set to 0.
+     * @param weight weight of scale (lower the weight, wider the curve)
+     * @return quadratically scaled input
+     */
+    public static double squareScaleDeadband(double value,  double threshold, double weight) {
+        return squareScale(linearScaledDeadband(value, threshold), weight);
+    }
+
+    public static double squareScaleDeadband(double value, double threshold) {
+        return squareScale(linearScaledDeadband(value, threshold));
     }
 
     /**
@@ -33,6 +63,15 @@ public class Deadband {
      */
     public static double cubicScale(double value, double weight) {
         return weight * value * value * value + (1.0 - weight) * value;
+    }
+
+    /**
+     * Cubic scaling of input (default weight of 0).
+     * @param value input value from joystick/controller
+     * @return cubically scaled input
+     */
+    public static double cubicScale(double value) {
+        return cubicScale(value, 0.0);
     }
 
     /**
@@ -49,30 +88,13 @@ public class Deadband {
     }
 
     /**
-     * Thresholds and scales linearly using linear ramps with potentially different slopes
-     * @param val = raw input from controllers/joysticks
-     * @param threshold = deadband threshold  (values less than this are ignored)
-     * @param absoluteMin = absolute value of min range (must be greater than 0)
-     * @param absoluteMidOut = absolute value of what absoluteMidIn should map to
-     * @param absoluteMidIn = ramps using one slope when less that absoluteMidIn, and another when greater
-     * @param absoluteMax = absolute value of max range (must be less than 1)
-     *
-     * @return Corrected input from joystick. If input is below threshold, 0 is returned.
-     * 		   If not, input is scaled between (min, max) with absoluteMidIn mapping to absoluteMidOut	 */
-    public static double deadbandAndScaleDualRamp(double val, double threshold, double absoluteMin, double absoluteMidIn, double absoluteMidOut,
-                                                  double absoluteMax) {
-
-        double returnVal;
-
-        if (Math.abs(val) <= threshold) {
-            return 0;
-        } else if (Math.abs(val) <= absoluteMidIn) {
-            returnVal = ((absoluteMidOut - absoluteMin) / (absoluteMidIn - threshold)) * (Math.abs(val) - threshold) + absoluteMin;
-        } else {
-            returnVal = ((absoluteMax - absoluteMidOut) / (1 - absoluteMidIn)) * (Math.abs(val) - absoluteMidIn) + absoluteMidOut;
-        }
-
-        return val > 0 ? returnVal : -returnVal;
-
+     * Thresholds and scales cubically
+     * @param value input value from joystick/controller
+     * @param threshold deadband threshold. Values below this threshold are set to 0.
+     * @return deadbanded and cubically scaled input
+     */
+    public static double cubicScaledDeadband(double value, double threshold) {
+        return cubicScaledDeadband(value, threshold, 0);
     }
+
 }
