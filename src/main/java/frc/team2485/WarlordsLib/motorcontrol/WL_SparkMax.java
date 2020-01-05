@@ -22,6 +22,15 @@ public class WL_SparkMax extends WPI_SparkMax {
         this.restoreFactoryDefaults();
     }
 
+    /**
+     * Create a new Brushless SPARK MAX Controller
+     *
+     * @param deviceID The device ID.
+     */
+    public WL_SparkMax(int deviceID) {
+        this(deviceID, MotorType.kBrushless);
+    }
+
     public void setFollowers(WL_SparkMax slave, WL_SparkMax... slaves) {
         slave.follow(this);
         for (CANSparkMax m : slaves) {

@@ -3,11 +3,23 @@ package frc.team2485.WarlordsLib.sensors;
 import edu.wpi.first.wpilibj.DigitalSource;
 import edu.wpi.first.wpilibj.Encoder;
 
-public class WL_Encoder extends Encoder implements Sensor {
+public class WL_Encoder extends Encoder {
 
     private double _pulsesPerRotation;
     private double _gearRatio;
     private double _wheelRadius;
+
+    public enum EncoderType {
+        USDIGITAL_250PPI(250),
+        USDIGITAL_512PPI(512),
+        USDIGITAL__1000PPI(1000);
+
+        private final int pulsesPerRotation;
+
+        private EncoderType(int pulsesPerRotation) {
+            this.pulsesPerRotation = pulsesPerRotation;
+        }
+    }
 
     /**
      * Sets multiplier conversion for getting position and velocity from pulses
@@ -23,21 +35,31 @@ public class WL_Encoder extends Encoder implements Sensor {
     }
 
     /**
-     * Get distance since last reset as multiplied with distance per pulse
-     * @return distance
+     * Sets multiplier conversion for getting position and velocity from pulses
+     * @param encoderType EncoderType of encoder
+     * @param gearRatio gear ratio of mechanism attached to motor
+     * @param wheelRadius radius of the wheel/mechanism
      */
-    @Override
-    public double getPosition() {
-        return this.getDistance();
+    private void setDistancePerPulse(EncoderType encoderType, double gearRatio, double wheelRadius) {
+        this.setDistancePerPulse(encoderType.pulsesPerRotation, gearRatio, wheelRadius);
     }
 
     /**
-     * Get rate of encoder 
-     * @return
+     * Sets multiplier conversion for getting position and velocity from pulses in radians
+     * @param pulsesPerRotation PPR of encoder
+     * @param gearRatio gear ratio of mechanism attached to motor
      */
-    @Override
-    public double getVelocity() {
-        return this.getRate();
+    private void setAnglePerPulse(double pulsesPerRotation, double gearRatio) {
+        this.setDistancePerPulse(gearRatio * (Math.PI * 2) / pulsesPerRotation);
+    }
+
+    /**
+     * Sets multiplier conversion for getting position and velocity from pulses in radians
+     * @param encoderType EncoderType of encoder
+     * @param gearRatio gear ratio of mechanism attached to motor
+     */
+    private void setAnglePerPulse(EncoderType encoderType, double gearRatio) {
+        this.setAnglePerPulse(encoderType.pulsesPerRotation, gearRatio);
     }
 
 //// //// DEFAULT CONSTRUCTORS ////
