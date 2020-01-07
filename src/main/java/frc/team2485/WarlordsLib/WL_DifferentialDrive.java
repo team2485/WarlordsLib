@@ -25,7 +25,6 @@ public class WL_DifferentialDrive extends DifferentialDrive {
     public WL_DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
         super(leftMotor, rightMotor);
         this.setDeadband(0);
-        this.setRightSideInverted(false);
     }
 
     /**
