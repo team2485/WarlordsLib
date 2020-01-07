@@ -2,96 +2,138 @@ package frc.team2485.WarlordsLib;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class Limelight {
 
+    private NetworkTableInstance _networkTableInstance;
+    private NetworkTable _limelightTable;
+
+    private enum LimelightVersion {
+        ONE(54, 41), TWO(59.6, 49.7);
+
+        private double fovx;
+        private double fovy;
+
+        public double getFovx() {
+            return fovx;
+        }
+
+        public double getFovy() {
+            return fovy;
+        }
+
+        private LimelightVersion(double fovx, double fovy) {
+            this.fovx = fovx;
+            this.fovy = fovy;
+        }
+    }
+
+    private LimelightVersion _limelightVersion;
+
+    public Limelight(LimelightVersion limelightVersion) {
+        _limelightVersion = limelightVersion;
+        _networkTableInstance = NetworkTableInstance.getDefault();
+        _limelightTable = _networkTableInstance.getTable("limelight");
+    }
+
+    public Limelight(int limelightVersion) {
+        this(limelightVersion == 1 ? LimelightVersion.ONE : LimelightVersion.TWO);
+    }
+
+    public Limelight() {
+        this(LimelightVersion.TWO);
+    }
+
+    public LimelightVersion getLimelightVersion() {
+        return this._limelightVersion;
+    }
     /**
      * Whether Limelight has any valid targets
      * @return limelight has valid target
      */
     public boolean hasValidTarget() {
-        return getProperty("tv") == 1.0;
+        return getDoubleProperty("tv", 0.0) == 1.0;
     }
 
     /**
      * Horizontal Offset From Crosshair To Target (LL1: -27 degrees to 27 degrees | LL2: -29.8 to 29.8 degrees)
      * @return degrees offset
      */
-    public double getHorizontalOffset() {
-        return getProperty("tx");
+    public double getTargetHorizontalOffset(double defaultValue) {
+        return getDoubleProperty("tx", defaultValue);
     }
 
     /**
      * Vertical Offset From Crosshair To Target (LL1: -20.5 degrees to 20.5 degrees | LL2: -24.85 to 24.85 degrees)
      * @return degrees offset
      */
-    public double getVerticalOffset() {
-        return getProperty("ty");
+    public double getTargetVerticalOffset(double defaultValue) {
+        return getDoubleProperty("ty", defaultValue);
     }
 
     /**
      * Target Area (0% of image to 100% of image)
      * @return percent of image
      */
-    public double getTargetArea() {
-        return getProperty("ta");
+    public double getTargetArea(double defaultValue) {
+        return getDoubleProperty("ta", defaultValue);
     }
 
     /**
      * Skew or rotation (-90 degrees to 0 degrees)
      * @return degrees
      */
-    public double getSkew() {
-        return getProperty("ts");
+    public double getTargetSkew(double defaultValue) {
+        return getDoubleProperty("ts", defaultValue);
     }
 
     /**
      * The pipeline’s latency contribution (ms) Add at least 11ms for image capture latency.
      * @return milliseconds
      */
-    public double getLatencyContribution() {
-        return getProperty("tl");
+    public double getLatencyContribution(double defaultValue) {
+        return getDoubleProperty("tl", defaultValue);
     }
 
     /**
      * Sidelength of shortest side of the fitted bounding box (pixels)
      * @return pixels
      */
-    public double getBoundingBoxShortLength() {
-        return getProperty("tshort");
+    public double getBoundingBoxShortLength(double defaultValue) {
+        return getDoubleProperty("tshort", defaultValue);
     }
 
     /**
      * Sidelength of longest side of the fitted bounding box (pixels)
      * @return pixels
      */
-    public double getBoundingBoxLongLength() {
-        return getProperty("tlong");
+    public double getBoundingBoxLongLength(double defaultValue) {
+        return getDoubleProperty("tlong", defaultValue);
     }
 
     /**
      * Horizontal sidelength of the rough bounding box (0 - 320 pixels)
      * @return 0-320 pixels
      */
-    public double getBoundingBoxHorizontalLength() {
-        return getProperty("thor");
+    public double getBoundingBoxHorizontalLength(double defaultValue) {
+        return getDoubleProperty("thor", defaultValue);
     }
 
     /**
      * 	Vertical sidelength of the rough bounding box (0 - 320 pixels)
      * @return 0-320 pixels
      */
-    public double getBoundingBoxVerticalLength() {
-        return getProperty("tvert");
+    public double getBoundingBoxVerticalLength(double defaultValue) {
+        return getDoubleProperty("tvert", defaultValue);
     }
 
     /**
      * True active pipeline index of the camera (0 .. 9)
      * @return index 0 to 9
      */
-    public double getActivePipelineIndex() {
-        return getProperty("getpipe");
+    public double getActivePipelineIndex(double defaultValue) {
+        return getDoubleProperty("getpipe", defaultValue);
     }
 
     /**
@@ -99,7 +141,7 @@ public class Limelight {
      * @return position array
      */
     public double[] getCameraTranslation() {
-        return getTable().getEntry("camtran").getDoubleArray(new double[6]);
+        return _limelightTable.getEntry("camtran").getDoubleArray(new double[6]);
     }
 
     private enum LedMode {
@@ -117,7 +159,7 @@ public class Limelight {
      * @param mode Default, Off, Blink or On
      */
     public void setLedMode(LedMode mode) {
-        setProperty("ledMode", mode.id);
+        setNumberProperty("ledMode", mode.id);
     }
 
     /**
@@ -125,7 +167,7 @@ public class Limelight {
      * @param enable If true use LL as a vision processor; if false use LL as a driver camera (Increases exposure, disables vision processing)
      */
     public void enableVisionProcessing(boolean enable) {
-        setProperty("camMode", enable ? 0 : 1);
+        setNumberProperty("camMode", enable ? 0 : 1);
     }
 
     /**
@@ -134,7 +176,7 @@ public class Limelight {
      */
     public void setPipeline(int pipeline) {
         if (pipeline >= 0 && pipeline <= 9) {
-            setProperty("pipeline", pipeline);
+            setNumberProperty("pipeline", pipeline);
         }
     }
 
@@ -157,7 +199,7 @@ public class Limelight {
      * @param mode streaming mode
      */
     public void setStreamingMode(StreamingMode mode) {
-        setProperty("stream", mode.id);
+        setNumberProperty("stream", mode.id);
     }
 
     /**
@@ -165,7 +207,7 @@ public class Limelight {
      * @param enable enable snapshots
      */
     public void enableSnapshots(boolean enable) {
-        setProperty("snapshot", enable ? 1 : 0);
+        setNumberProperty("snapshot", enable ? 1 : 0);
     }
 
     /**
@@ -173,7 +215,7 @@ public class Limelight {
      * @return number array
      */
     public Number[] getCornerYCoordinates() {
-        return getTable().getEntry("tcorny").getNumberArray(new Number[0]);
+        return _limelightTable.getEntry("tcorny").getNumberArray(new Number[0]);
     }
 
     /**
@@ -181,23 +223,69 @@ public class Limelight {
      * @return number array
      */
     public Number[] getCornerXCoordinates() {
-        return getTable().getEntry("tcornx").getNumberArray(new Number[0]);
+        return _limelightTable.getEntry("tcornx").getNumberArray(new Number[0]);
+    }
+
+    /**
+     * Raw screenspace X of ungrouped target
+     * @param target contour 0 to 2
+     * @return -1 to 1 normalized screenspace
+     */
+    public double getUngroupedTargetScreenspaceX(int target, double defaultValue) {
+        return getDoubleProperty("tx" + target, defaultValue);
+    }
+
+    /**
+     * Raw screenspace Y of ungrouped target
+     * @param target contour 0 to 2
+     * @return -1 to 1 normalized screenspace
+     */
+    public double getUngroupedTargetScreenspaceY(int target, double defaultValue) {
+        return getDoubleProperty("ty" + target, defaultValue);
     }
 
 
     /**
-     * Get the limelight's network table.
-     * @return NetworkTable of limelight;
+     * Target area of ungrouped target
+     * @param target contour 0 to 2
+     * @return percent area of image
      */
-    public NetworkTable getTable() {
-        return NetworkTableInstance.getDefault().getTable("limelight");
+    public double getUngroupedTargetArea(int target, double defaultValue) {
+        return getDoubleProperty("ta" + target, defaultValue);
     }
 
-    public double getProperty(String key) {
-        return getTable().getEntry(key).getDouble(0);
+    /**
+     * Get crosshair x
+     * @param crosshair crosshair 0 or 1
+     * @return normalized screenspace
+     */
+    public double getCrosshairX(int crosshair, double defaultValue) {
+        return _limelightTable.getEntry("cx" + crosshair).getDouble(defaultValue);
     }
 
-    public void setProperty(String key, int n) {
-        getTable().getEntry(key).setNumber(n);
+    /**
+     * Get crosshair y
+     * @param crosshair crosshair 0 or 1
+     * @return normalized screenspace
+     */
+    public double getCrosshairY(int crosshair, double defaultValue) {
+        return _limelightTable.getEntry("cy" + crosshair).getDouble(defaultValue);
+    }
+
+    /**
+     * Skew or rotation of ungrouped target
+     * @param target contour 0 to 2
+     * @return -90 to 90 degrees
+     */
+    public double getUngroupedTargetrSkew(int target, double defaultValue) {
+        return getDoubleProperty("tx" + target, defaultValue);
+    }
+
+    public double getDoubleProperty(String key, double defaultValue) {
+        return _limelightTable.getEntry(key).getDouble(defaultValue);
+    }
+
+    public void setNumberProperty(String key, Number n) {
+        _limelightTable.getEntry(key).setNumber(n);
     }
 }
