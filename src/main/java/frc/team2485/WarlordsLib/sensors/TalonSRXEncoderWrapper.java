@@ -17,6 +17,8 @@ public class TalonSRXEncoderWrapper {
 
 	private TalonSRX talon;
 
+	private SensorCollection sensors;
+
 	public TalonSRXEncoderWrapper(TalonSRX motorController) {
 		this(motorController, DEFAULT_TICKS_PER_REVOLUTION);
 	}
@@ -24,6 +26,7 @@ public class TalonSRXEncoderWrapper {
 	public TalonSRXEncoderWrapper(TalonSRX motorController, int ticksPerRevolution) {
 		this.talon = motorController;
 		this.ticksPerRevolution = ticksPerRevolution;
+		this.sensors = talon.getSensorCollection();
 	}
 
     public void setDistancePerRevolution(double distancePerRevolution) {
@@ -47,10 +50,10 @@ public class TalonSRXEncoderWrapper {
     }
 
     public SensorCollection getSensor() {
-		return talon.getSensorCollection();
+		return sensors;
 	}
 
     public double getQuadraturePosition() {
-        return talon.getSensorCollection().getQuadraturePosition();
+        return sensors.getQuadraturePosition();
     }
 }

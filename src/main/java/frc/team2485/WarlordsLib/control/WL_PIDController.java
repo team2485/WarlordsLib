@@ -1,6 +1,8 @@
 package frc.team2485.WarlordsLib.control;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.ConfigurableBuilder;
 
@@ -53,11 +55,26 @@ public class WL_PIDController extends PIDController implements Configurable {
         return super.calculate(measurement) + m_Kf * this.getSetpoint();
     }
 
+    public double calculateClamped(double measurement, double minOutput, double maxOutput) {
+        return MathUtil.clamp(calculate(measurement), minOutput, maxOutput);
+    }
+
+    public double calculateClamped(double measurement, double setpoint, double minOutput, double maxOutput) {
+        this.setSetpoint(setpoint);
+        return calculateClamped(measurement, minOutput, maxOutput);
+    }
+
     @Override
     public void initConfigurable(ConfigurableBuilder builder) {
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
+        builder.addDoubleProperty("f", this::getF, this::setF);
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
         builder.addDoubleProperty("f", this::getF, this::setF);
     }
 }

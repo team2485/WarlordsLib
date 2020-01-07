@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib.control;
+package frc.team2485.WarlordsLib.control.legacy;
 
 /**
  * A generic interface for control systems with a single setpoint and input

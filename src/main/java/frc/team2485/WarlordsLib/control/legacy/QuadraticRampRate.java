@@ -1,4 +1,6 @@
-package frc.team2485.WarlordsLib.control;
+package frc.team2485.WarlordsLib.control.legacy;
+
+import frc.team2485.WarlordsLib.control.legacy.ControlElement;
 
 /**
  * Quadratic ramp rate based on Jeremey's ramp rate.

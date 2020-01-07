@@ -17,7 +17,7 @@ public class ConfigurableBuilderImpl implements ConfigurableBuilder {
     }
 
     public ConfigurableBuilderImpl() {
-        _properties = new HashMap<String, Property>();
+        _properties = new HashMap<>();
     }
 
     /**

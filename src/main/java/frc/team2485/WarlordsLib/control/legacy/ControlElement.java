@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib.control;
+package frc.team2485.WarlordsLib.control.legacy;
 
 /**
  * A generic interface for classes with an input and output.
