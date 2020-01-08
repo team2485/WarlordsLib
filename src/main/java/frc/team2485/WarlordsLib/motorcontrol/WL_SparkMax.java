@@ -45,7 +45,7 @@ public class WL_SparkMax extends WPI_SparkMax {
     public WL_SparkMax(int deviceID, MotorType type, ControlType controlType) {
         super(deviceID, type);
         this.m_controlType = controlType;
-        this.m_pidController = this.getPidController();
+        this.m_pidController = this.getPIDController();
         this.m_encoder = this.getEncoder();
         m_setpoint = 0;
         //default PID values
