@@ -211,7 +211,7 @@ public class Limelight {
     }
 
     /**
-     * Enable “send contours” in the “Output” tab to stream corner coordinates:
+     * Enable "send contours" in the "Output" tab to stream corner coordinates:
      * @return number array
      */
     public Number[] getCornerYCoordinates() {
@@ -219,7 +219,7 @@ public class Limelight {
     }
 
     /**
-     * Enable “send contours” in the “Output” tab to stream corner coordinates:
+     * Enable "send contours" in the "Output" tab to stream corner coordinates:
      * @return number array
      */
     public Number[] getCornerXCoordinates() {
