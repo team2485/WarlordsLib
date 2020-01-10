@@ -1,10 +1,10 @@
 package frc.team2485.WarlordsLib.robotConfigs;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -179,6 +179,14 @@ public class RobotConfigs {
         _configs.put(category, key, Boolean.toString(value));
     }
 
+    public void saveConfigurable(String category, Configurable configurable) {
+        configurable.saveConfigs(new ConfigsWrapper(category, this));
+    }
+
+    public void loadConfigurable(String category, Configurable configurable) {
+        configurable.loadConfigs(new ConfigsWrapper(category, this));
+    }
+
     public void addConfigurable(String category, Configurable configurable) {
         _configurableRegistry.addConfigurable(category, configurable);
     }
@@ -188,27 +196,27 @@ public class RobotConfigs {
      */
     private class ConfigurableRegistry {
 
-        private WeakHashMap<String, ConfigurableBuilderImpl> _configurableBuilders;
+        private WeakHashMap<String, Configurable> _configurables;
 
         private ConfigurableRegistry() {
-            _configurableBuilders = new WeakHashMap<>();
+            _configurables = new WeakHashMap<>();
         }
 
         private void addConfigurable(String category, Configurable configurable) {
-            ConfigurableBuilderImpl c = new ConfigurableBuilderImpl();
-            configurable.initConfigurable(c);
-            _configurableBuilders.put(category, c);
-            c.updateAll(category);
+            configurable.loadConfigs(new ConfigsWrapper(category, RobotConfigs.getInstance()));
+            _configurables.put(category, configurable);
         }
 
         private void updateAll() {
-            for (Map.Entry<String, ConfigurableBuilderImpl> entry : _configurableBuilders.entrySet()) {
-                entry.getValue().updateAll(entry.getKey());
+            System.out.println("Updating");
+            for (Map.Entry<String, Configurable> entry : _configurables.entrySet()) {
+                entry.getValue().loadConfigs(new ConfigsWrapper(entry.getKey(), RobotConfigs.getInstance()));
             }
         }
+
         private void saveAll() {
-            for (Map.Entry<String, ConfigurableBuilderImpl> entry : _configurableBuilders.entrySet()) {
-                entry.getValue().saveAll(entry.getKey());
+            for (Map.Entry<String, Configurable> entry : _configurables.entrySet()) {
+                entry.getValue().saveConfigs(new ConfigsWrapper(entry.getKey(), RobotConfigs.getInstance()));
             }
         }
     }

@@ -5,9 +5,8 @@ package frc.team2485.WarlordsLib.robotConfigs;
  */
 public interface Configurable {
 
-    /**
-     * Initializes this Configurable object.
-     * @param builder Configurable builder
-     */
-    void initConfigurable(ConfigurableBuilder builder);
+    void loadConfigs(LoadableConfigs configs);
+
+    void saveConfigs(SavableConfigs configs);
+
 }
