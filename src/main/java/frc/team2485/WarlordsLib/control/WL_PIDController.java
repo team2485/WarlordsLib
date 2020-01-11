@@ -4,7 +4,8 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
-import frc.team2485.WarlordsLib.robotConfigs.ConfigurableBuilder;
+import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
+import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
 public class WL_PIDController extends PIDController implements Configurable {
 
@@ -65,16 +66,24 @@ public class WL_PIDController extends PIDController implements Configurable {
     }
 
     @Override
-    public void initConfigurable(ConfigurableBuilder builder) {
-        builder.addDoubleProperty("p", this::getP, this::setP);
-        builder.addDoubleProperty("i", this::getI, this::setI);
-        builder.addDoubleProperty("d", this::getD, this::setD);
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
         builder.addDoubleProperty("f", this::getF, this::setF);
     }
 
     @Override
-    public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
-        builder.addDoubleProperty("f", this::getF, this::setF);
+    public void loadConfigs(LoadableConfigs configs) {
+        setP(configs.getDouble("p", getP()));
+        setI(configs.getDouble("i", getI()));
+        setD(configs.getDouble("d", getD()));
+        setF(configs.getDouble("f", getF()));
+    }
+
+    @Override
+    public void saveConfigs(SavableConfigs configs) {
+        configs.put("p", getP());
+        configs.put("i", getI());
+        configs.put("d", getD());
+        configs.put("f", getF());
     }
 }
