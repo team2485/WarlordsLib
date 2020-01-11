@@ -31,6 +31,11 @@ public class WL_SparkMax extends WPI_SparkMax {
         this(deviceID, MotorType.kBrushless);
     }
 
+    /**
+     * Sets other sparks to follow this Spark.
+     * @param slave the follower motor
+     * @param slaves any number of follower motors
+     */
     public void setFollowers(WL_SparkMax slave, WL_SparkMax... slaves) {
         slave.follow(this);
         for (CANSparkMax m : slaves) {
