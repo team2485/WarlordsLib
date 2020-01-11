@@ -199,12 +199,16 @@ public class RobotConfigs {
         _configs.put(category, key, Boolean.toString(value));
     }
 
-    // saves configurable (probably should just read method name)
+    /**
+     * saves configurable (probably should just read method name)
+     */
     public void saveConfigurable(String category, Configurable configurable) {
         configurable.saveConfigs(new ConfigsWrapper(category, this));
     }
 
-    // loads configurable
+    /**
+     * loads configurable
+     */
     public void loadConfigurable(String category, Configurable configurable) {
         configurable.loadConfigs(new ConfigsWrapper(category, this));
     }

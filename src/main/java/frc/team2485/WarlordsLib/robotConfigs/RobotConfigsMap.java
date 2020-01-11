@@ -162,27 +162,37 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
         return backup;
     }
 
-    // reports warning regarding given info in params
+    /**
+     * reports warning regarding given info in params
+     */
     private void reportWarning(String category, String key, String backup, String error) {
         DriverStation.reportWarning("RobotConfigsMap: Error in retrieving (" + category + ", " + key + "): " + error + "! Returning backup: " + backup + ".", false);
     }
 
-    // reports "Not Found" warning
+    /**
+     * reports "Not Found" warning
+     */
     private void reportWarningNotFound(String category, String key, String backup) {
         reportWarning(category, key, backup, "Not Found");
     }
 
-    // returns true/false if provided category contains a certain key
+    /**
+     * returns true/false if provided category contains a certain key
+     */
     public boolean containsKey(String category, String key) {
         return this.containsKey(category) && this.get(category).containsKey(key);
     }
 
-    // returns true/false if key is in given category
+    /**
+     * returns true/false if key is in given category
+     */
     public boolean containsCategory(String category) {
         return this.containsKey(category);
     }
 
-    // sets key to given category
+    /**
+     * sets key to given category
+     */
     public Set<String> keySet(String category) {
         if (containsCategory(category)) {
             return this.get(category).keySet();
