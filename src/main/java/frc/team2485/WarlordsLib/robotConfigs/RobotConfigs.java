@@ -15,6 +15,8 @@ import java.util.WeakHashMap;
  */
 public class RobotConfigs {
 
+    // Volatile is alternative to synchronize for allowing multiple threads to access methods without interfering with variable data
+    // Volatile does not cache values
     private static volatile RobotConfigs _instance;
 
     private RobotConfigsMap _configs;
@@ -63,6 +65,12 @@ public class RobotConfigs {
         loadConfigsFromFile(filepath, DEFAULT_CSV_SEPARATOR);
     }
 
+    /**
+     * Loads configs from file with parsing
+     * Use when file is not default CSV
+     * @param filepath location of file
+     * @param separator delimiter used in file
+     */
     public void loadConfigsFromFile(String filepath, String separator) {
         _configs.clear();
         File file = new File(filepath);
@@ -90,10 +98,20 @@ public class RobotConfigs {
         _configurableRegistry.updateAll();
     }
 
+    /**
+     * Saves config to file
+     * @param filepath location to save config file
+     */
     public void saveConfigsToFile(String filepath) {
         saveConfigsToFile(filepath, DEFAULT_CSV_SEPARATOR);
     }
 
+    /**
+     * Saves config to file but with parsing
+     * Use when special delimiter wanted in file (not default CSV)
+     * @param filepath location to save config file
+     * @param separator desired delimiter for data
+     */
     public void saveConfigsToFile(String filepath, String separator) {
 
         _configurableRegistry.saveAll();
@@ -119,6 +137,7 @@ public class RobotConfigs {
         }
     }
 
+    // returns config info by type
     public String getString(String category, String key, String backup) {
         checkConfigsLoaded();
         return _configs.getStringOrBackup(category, key, backup);
@@ -155,6 +174,7 @@ public class RobotConfigs {
         }
     }
 
+    // sets config info by type
     public void put(String category, String key, String value) {
         _configs.put(category, key, value);
     }
@@ -179,10 +199,12 @@ public class RobotConfigs {
         _configs.put(category, key, Boolean.toString(value));
     }
 
+    // saves configurable (probably should just read method name)
     public void saveConfigurable(String category, Configurable configurable) {
         configurable.saveConfigs(new ConfigsWrapper(category, this));
     }
 
+    // loads configurable
     public void loadConfigurable(String category, Configurable configurable) {
         configurable.loadConfigs(new ConfigsWrapper(category, this));
     }
