@@ -5,8 +5,16 @@ package frc.team2485.WarlordsLib.robotConfigs;
  */
 public interface Configurable {
 
+    /**
+     * Loads configs with RobotConfigs
+     * @param configs config to be loaded, type LoadableConfigs
+     */
     void loadConfigs(LoadableConfigs configs);
 
+    /**
+     * Saves configs with RobotConfigs
+     * @param configs config to be saved, type LoadableConfigs
+     */
     void saveConfigs(SavableConfigs configs);
 
 }

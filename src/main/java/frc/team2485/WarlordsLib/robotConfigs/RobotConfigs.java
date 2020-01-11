@@ -15,6 +15,8 @@ import java.util.WeakHashMap;
  */
 public class RobotConfigs {
 
+    // Volatile is alternative to synchronize for allowing multiple threads to access methods without interfering with variable data
+    // Volatile does not cache values
     private static volatile RobotConfigs _instance;
 
     private RobotConfigsMap _configs;
@@ -41,16 +43,26 @@ public class RobotConfigs {
         return _instance;
     }
 
+    /**
+     * Constructor
+     */
     private RobotConfigs() {
         _configs = new RobotConfigsMap();
         _configurableRegistry = new ConfigurableRegistry();
         _loaded = false;
     }
 
+    /**
+     * Returns true/false if configs have been loaded from file
+     */
     private boolean configsLoadedFromFile() {
         return this._loaded;
     }
 
+    /**
+     * Sets _loaded with boolean if configs have been loaded
+     * @param loaded true/false if configs loaded
+     */
     private void setConfigsLoadedFromFile(boolean loaded) {
         this._loaded = loaded;
     }
@@ -63,6 +75,12 @@ public class RobotConfigs {
         loadConfigsFromFile(filepath, DEFAULT_CSV_SEPARATOR);
     }
 
+    /**
+     * Loads configs from file with parsing
+     * Use when file is not default CSV
+     * @param filepath location of file
+     * @param separator delimiter used in file
+     */
     public void loadConfigsFromFile(String filepath, String separator) {
         _configs.clear();
         File file = new File(filepath);
@@ -90,10 +108,20 @@ public class RobotConfigs {
         _configurableRegistry.updateAll();
     }
 
+    /**
+     * Saves config to file
+     * @param filepath location to save config file
+     */
     public void saveConfigsToFile(String filepath) {
         saveConfigsToFile(filepath, DEFAULT_CSV_SEPARATOR);
     }
 
+    /**
+     * Saves config to file but with parsing
+     * Use when special delimiter wanted in file (not default CSV)
+     * @param filepath location to save config file
+     * @param separator desired delimiter for data
+     */
     public void saveConfigsToFile(String filepath, String separator) {
 
         _configurableRegistry.saveAll();
@@ -119,74 +147,161 @@ public class RobotConfigs {
         }
     }
 
+    /**
+     * Returns String from configs
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param backup desired backup value
+     */
     public String getString(String category, String key, String backup) {
         checkConfigsLoaded();
         return _configs.getStringOrBackup(category, key, backup);
     }
 
+    /**
+     * Returns double from configs
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param backup desired backup value
+     */
     public double getDouble(String category, String key, double backup) {
         checkConfigsLoaded();
         return _configs.getDoubleOrBackup(category, key, backup);
     }
 
+    /**
+     * Returns int from configs
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param backup desired backup value
+     */
     public int getInt(String category, String key, int backup) {
         checkConfigsLoaded();
         return _configs.getIntOrBackup(category, key, backup);
     }
 
+    /**
+     * Returns float from configs
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param backup desired backup value
+     */
     public float getFloat(String category, String key, float backup) {
         checkConfigsLoaded();
         return _configs.getFloatOrBackup(category, key, backup);
     }
 
+    /**
+     * Returns long from configs
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param backup desired backup value
+     */
     public long getLong(String category, String key, long backup) {
         checkConfigsLoaded();
         return _configs.getLongOrBackup(category, key, backup);
     }
 
+    /**
+     * Returns boolean from configs
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param backup desired backup value
+     */
     public boolean getBoolean(String category, String key, boolean backup) {
         checkConfigsLoaded();
         return _configs.getBooleanOrBackup(category, key, backup);
     }
 
+    /**
+     * Checks if configs have been loaded
+     * If not, reports relevant warning
+     */
     private void checkConfigsLoaded() {
         if (!configsLoadedFromFile()) {
             DriverStation.reportWarning("RobotConfigs has not loaded a file yet, so no constants have been loaded. Make sure to run method loadConfigsFromFile!", true);
         }
     }
 
+    /**
+     * Sets desired config info for String value
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param value value for constant
+     */
     public void put(String category, String key, String value) {
         _configs.put(category, key, value);
     }
 
+    /**
+     * Sets desired config info for double value
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param value value for constant
+     */
     public void put(String category, String key, double value) {
         _configs.put(category, key, Double.toString(value));
     }
 
+    /**
+     * Sets desired config info for float value
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param value value for constant
+     */
     public void put(String category, String key, float value) {
         _configs.put(category, key, Float.toString(value));
     }
 
+    /**
+     * Sets desired config info for int value
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param value value for constant
+     */
     public void put(String category, String key, int value) {
         _configs.put(category, key, Integer.toString(value));
     }
 
+    /**
+     * Sets desired config info for long value
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param value value for constant
+     */
     public void put(String category, String key, long value) {
         _configs.put(category, key, Long.toString(value));
     }
 
+    /**
+     * Sets desired config info for boolean value
+     * @param category desired subsystem
+     * @param key desired constant
+     * @param value value for constant
+     */
     public void put(String category, String key, boolean value) {
         _configs.put(category, key, Boolean.toString(value));
     }
 
+    /**
+     * saves configurable (probably should just read method name)
+     */
     public void saveConfigurable(String category, Configurable configurable) {
         configurable.saveConfigs(new ConfigsWrapper(category, this));
     }
 
+    /**
+     * loads configurable
+     */
     public void loadConfigurable(String category, Configurable configurable) {
         configurable.loadConfigs(new ConfigsWrapper(category, this));
     }
 
+    /**
+     * Adds desired subsystem configurable to registry
+     * @param category desired subsystem
+     * @param configurable loaded config
+     */
     public void addConfigurable(String category, Configurable configurable) {
         _configurableRegistry.addConfigurable(category, configurable);
     }
