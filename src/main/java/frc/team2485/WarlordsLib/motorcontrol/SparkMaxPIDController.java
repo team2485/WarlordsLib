@@ -4,6 +4,7 @@ import com.revrobotics.*;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
@@ -22,9 +23,17 @@ public class SparkMaxPIDController implements Sendable, Configurable {
 
     private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIAccum;
 
-    public SparkMaxPIDController(CANSparkMax motor, CANEncoder feedbackDevice, ControlType controlType) {
 
-        this._encoder = feedbackDevice;
+    public SparkMaxPIDController(CANSparkMax motor, ControlType controlType) {
+        this(motor, controlType, motor.getEncoder());
+    }
+
+    public SparkMaxPIDController(CANSparkMax motor, ControlType controlType, CANEncoder encoder) {
+
+
+        this._motor = motor;
+
+        this._encoder = encoder;
         this._controlType = controlType;
 
         this._controller = motor.getPIDController();
@@ -175,14 +184,30 @@ public class SparkMaxPIDController implements Sendable, Configurable {
     }
 
     /**
-     * Set the target for Talon PIDController.
+     * Set the target for Spark PIDController.
      * @param target
      */
-    public void setReference(double target) {
+    public void run(double target) {
         setSetpoint(target);
+        run();
+    }
+
+    public void run() {
         _controller.setReference(_setpoint, _controlType);
     }
 
+    /**
+     * Set the controller reference value based on the selected control mode.
+     *
+     * @param setpoint The value to set depending on the control mode. For basic
+     * duty cycle control this should be a value between -1 and 1
+     * Otherwise: Voltage Control: Voltage (volts) Velocity Control: Velocity
+     * (RPM) Position Control: Position (Rotations) Current Control: Current
+     * (Amps). Native units can be changed using the setPositionConversionFactor()
+     * or setVelocityConversionFactor() methods of the CANEncoder class
+     *
+     *
+     */
     public void setSetpoint(double setpoint) {
         this._setpoint = setpoint;
     }
@@ -193,6 +218,7 @@ public class SparkMaxPIDController implements Sendable, Configurable {
 
     public void reset() {
         _controller.setIAccum(0);
+        _encoder.setPosition(0);
     }
 
     public CANPIDController getPIDController() {
@@ -201,15 +227,13 @@ public class SparkMaxPIDController implements Sendable, Configurable {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("PIDController");
+//        builder.setSmartDashboardType("PIDController");
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("f", this::getFeedforward, this::setFeedforward);
         builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-
-        builder.addDoubleProperty("output", this::getOutput, null);
     }
 
     @Override
