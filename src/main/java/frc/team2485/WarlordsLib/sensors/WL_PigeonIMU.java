@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-public class WL_PigeonIMU extends PigeonIMU implements Sendable, Sensor {
+public class WL_PigeonIMU extends PigeonIMU implements Sendable {
 
     public static enum Units {
         DEGS, RADS

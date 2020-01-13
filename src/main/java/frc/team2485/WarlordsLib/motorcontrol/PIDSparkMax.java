@@ -1,44 +1,41 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
-import com.revrobotics.*;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.controller.PIDController;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
-public class SparkMaxPIDController implements Sendable, Configurable {
+public class PIDSparkMax extends WL_SparkMax implements Configurable {
 
-    private CANSparkMax _motor;
+    private ControlType _controlType;
 
     private CANPIDController _controller;
 
     private CANEncoder _encoder;
 
-    private ControlType _controlType;
-
     private double _setpoint;
 
     private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIAccum;
 
+    /**
+     * Create a new Brushless SPARK MAX Controller
+     *
+     * @param deviceID The device ID.
+     */
+    public PIDSparkMax(int deviceID, ControlType controlType, CANEncoder feedbackReference) {
+        super(deviceID);
 
-    public SparkMaxPIDController(CANSparkMax motor, ControlType controlType) {
-        this(motor, controlType, motor.getEncoder());
-    }
-
-    public SparkMaxPIDController(CANSparkMax motor, ControlType controlType, CANEncoder encoder) {
-
-
-        this._motor = motor;
-
-        this._encoder = encoder;
         this._controlType = controlType;
 
-        this._controller = motor.getPIDController();
+        this._encoder = feedbackReference;
 
         this._controller.setFeedbackDevice(_encoder);
+
+        this._controller = this.getPIDController();
+
         this._controller.setIAccum(0);
 
         this.kP = this._controller.getP();
@@ -149,29 +146,6 @@ public class SparkMaxPIDController implements Sendable, Configurable {
     }
 
     /**
-     * Get output depending on the {@link ControlType}
-     * @return output of pid
-     */
-    public double getOutput()  {
-        switch (_controlType) {
-            case kCurrent:
-                return _motor.getOutputCurrent();
-            case kSmartVelocity:
-            case kVelocity:
-                return _encoder.getVelocity();
-            case kSmartMotion:
-            case kPosition:
-                return _encoder.getPosition();
-            case kVoltage:
-                return _motor.getBusVoltage();
-            case kDutyCycle:
-                return _motor.getAppliedOutput();
-            default:
-                return 0;
-        }
-    }
-
-    /**
      *
      * @return the control type the PIDController is using (current, velocity, position)
      */
@@ -183,17 +157,17 @@ public class SparkMaxPIDController implements Sendable, Configurable {
         this._controlType = controlType;
     }
 
-    /**
-     * Set the target for Spark PIDController.
-     * @param target
-     */
-    public void run(double target) {
-        setSetpoint(target);
-        run();
+    public void setReference() {
+        _controller.setReference(_setpoint, _controlType);
     }
 
-    public void run() {
-        _controller.setReference(_setpoint, _controlType);
+    public void setReference(double target) {
+        setSetpoint(target);
+        setReference();
+    }
+
+    public CANPIDController getController() {
+        return this._controller;
     }
 
     /**
@@ -217,12 +191,34 @@ public class SparkMaxPIDController implements Sendable, Configurable {
     }
 
     public void reset() {
-        _controller.setIAccum(0);
+        this._controller.setIAccum(0);
+    }
+
+    public void zero() {
         _encoder.setPosition(0);
     }
 
-    public CANPIDController getPIDController() {
-        return this._controller;
+    /**
+     * Get output depending on the {@link ControlType}
+     * @return output of pid
+     */
+    public double getOutput()  {
+        switch (_controlType) {
+            case kCurrent:
+                return this.getOutputCurrent();
+            case kSmartVelocity:
+            case kVelocity:
+                return _encoder.getVelocity();
+            case kSmartMotion:
+            case kPosition:
+                return _encoder.getPosition();
+            case kVoltage:
+                return this.getBusVoltage();
+            case kDutyCycle:
+                return this.getAppliedOutput();
+            default:
+                return 0;
+        }
     }
 
     @Override
@@ -244,5 +240,6 @@ public class SparkMaxPIDController implements Sendable, Configurable {
     public void saveConfigs(SavableConfigs configs) {
 
     }
+
 
 }
