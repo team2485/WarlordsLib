@@ -21,7 +21,7 @@ public class PIDTalonSRX extends WL_TalonSRX {
 
         this.controlMode = controlMode;
 
-        this.kP = this.get
+//        this.kP = this.get
 
 
     }
