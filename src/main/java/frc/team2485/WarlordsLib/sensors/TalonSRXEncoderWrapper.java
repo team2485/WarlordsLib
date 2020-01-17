@@ -94,10 +94,10 @@ public class TalonSRXEncoderWrapper implements Encoder {
     }
 
     private int convertDistanceToTicks(double distance) {
-        return this.convertDistanceToTicks(distance, distancePerRevolution, ticksPerRevolution);
+        return (int) (distance * ticksPerRevolution / distancePerRevolution);
     }
 
     private double convertTicksToDistance(int ticks) {
-        return this.convertTicksToDistance(ticks, distancePerRevolution, ticksPerRevolution);
+        return ticks * distancePerRevolution / ticksPerRevolution;
     }
 }

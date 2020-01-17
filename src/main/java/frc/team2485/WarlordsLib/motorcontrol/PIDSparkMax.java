@@ -18,21 +18,19 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
 
     private double _setpoint;
 
-    private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIAccum;
+    private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
 
     /**
      * Create a new Brushless SPARK MAX Controller
      *
      * @param deviceID The device ID.
      */
-    public PIDSparkMax(int deviceID, ControlType controlType, CANEncoder feedbackReference) {
+    public PIDSparkMax(int deviceID, ControlType controlType) {
         super(deviceID);
 
         this._controlType = controlType;
 
-        this._encoder = feedbackReference;
-
-        this._controller.setFeedbackDevice(_encoder);
+        this._encoder = this.getEncoder();
 
         this._controller = this.getPIDController();
 
@@ -45,7 +43,12 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         this.kF = this._controller.getFF();
         this.kMaxOutput = this._controller.getOutputMax();
         this.kMinOutput = this._controller.getOutputMin();
-        this.kIAccum = this._controller.getIAccum();
+        this.kIMaxAccum = this._controller.getIMaxAccum(0);
+    }
+
+    public void setFeedbackDevice(CANEncoder feedbackDevice) {
+        this._encoder = feedbackDevice;
+        _controller.setFeedbackDevice(feedbackDevice);
     }
 
     public double getP() {
@@ -93,11 +96,22 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         }
     }
 
-    public double getFeedforward() {
+    public double getIMaxAccum() {
+        return _controller.getIMaxAccum(0);
+    }
+
+    public void setIMaxAccum(double kIMaxAccum) {
+        if (this.kIMaxAccum != kIMaxAccum) {
+            _controller.setIMaxAccum(kIMaxAccum, 0);
+            this.kIMaxAccum = kIMaxAccum;
+        }
+    }
+
+    public double getF() {
         return _controller.getFF();
     }
 
-    public void setFeedforward(double kF) {
+    public void setF(double kF) {
         if (this.kF != kF) {
             _controller.setFF(kF);
             this.kF = kF;
@@ -110,17 +124,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
 
     public double getMinOutput() {
         return _controller.getOutputMin();
-    }
-
-    public double getIAccumulator() {
-        return _controller.getIAccum();
-    }
-
-    public void setIAccumulator(double kIAccum) {
-        if (this.kIAccum != kIAccum) {
-            _controller.setIAccum(kIAccum);
-            this.kIAccum = kIAccum;
-        }
     }
 
     public void setPID(double p, double i,double d) {
@@ -198,6 +201,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         _encoder.setPosition(0);
     }
 
+
+
     /**
      * Get output depending on the {@link ControlType}
      * @return output of pid
@@ -227,18 +232,30 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
-        builder.addDoubleProperty("f", this::getFeedforward, this::setFeedforward);
+        builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
+        builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
     }
 
     @Override
     public void loadConfigs(LoadableConfigs configs) {
+        this.setP(configs.getDouble("p", this.getP()));
+        this.setI(configs.getDouble("i", this.getI()));
+        this.setD(configs.getDouble("d", this.getD()));
+        this.setF(configs.getDouble("f", this.getF()));
+        this.setIzone(configs.getDouble("iZone", this.getIzone()));
+        this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
     }
 
     @Override
     public void saveConfigs(SavableConfigs configs) {
-
+        configs.put("p", this.getP());
+        configs.put("i", this.getI());
+        configs.put("d", this.getD());
+        configs.put("f", this.getF());
+        configs.put("iZone", this.getIzone());
+        configs.put("iMaxAccum", this.getIMaxAccum());
     }
 
 
