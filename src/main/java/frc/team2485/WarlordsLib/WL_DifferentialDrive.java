@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  *
  * No deadbands and input squaring by default (the idea is that all scaling happens in RobotContainer, not the subsystem,
  *      as that is a driver preference. Use {@link frc.team2485.WarlordsLib.oi.Deadband} to deadband/scale controllers).
- * Right side NOT inverted
+ *
+ * RIGHT SIDE IS INVERTED!
  *
  */
 public class WL_DifferentialDrive extends DifferentialDrive {

@@ -31,16 +31,19 @@ public class Limelight {
 
     private LimelightVersion _limelightVersion;
 
+    /**
+     * Wrapper for Limelight.
+     * @param limelightVersion version of this limelight.
+     */
     public Limelight(LimelightVersion limelightVersion) {
         _limelightVersion = limelightVersion;
         _networkTableInstance = NetworkTableInstance.getDefault();
         _limelightTable = _networkTableInstance.getTable("limelight");
     }
 
-    public Limelight(int limelightVersion) {
-        this(limelightVersion == 1 ? LimelightVersion.ONE : LimelightVersion.TWO);
-    }
-
+    /**
+     * Wrapper for Limelight.
+     */
     public Limelight() {
         this(LimelightVersion.TWO);
     }

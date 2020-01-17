@@ -23,6 +23,7 @@ public class WL_TalonSRX extends WPI_TalonSRX {
     public WL_TalonSRX(int deviceNumber, boolean isInverted) {
         super(deviceNumber);
         this.configFactoryDefault();
+        this.clearStickyFaults();
         this.setInverted(isInverted);
     }
 
