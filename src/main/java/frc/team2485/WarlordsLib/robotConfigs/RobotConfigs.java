@@ -15,8 +15,6 @@ import java.util.WeakHashMap;
  */
 public class RobotConfigs {
 
-    // Volatile is alternative to synchronize for allowing multiple threads to access methods without interfering with variable data
-    // Volatile does not cache values
     private static volatile RobotConfigs _instance;
 
     private RobotConfigsMap _configs;
@@ -43,26 +41,16 @@ public class RobotConfigs {
         return _instance;
     }
 
-    /**
-     * Constructor
-     */
     private RobotConfigs() {
         _configs = new RobotConfigsMap();
         _configurableRegistry = new ConfigurableRegistry();
         _loaded = false;
     }
 
-    /**
-     * Returns true/false if configs have been loaded from file
-     */
     private boolean configsLoadedFromFile() {
         return this._loaded;
     }
 
-    /**
-     * Sets _loaded with boolean if configs have been loaded
-     * @param loaded true/false if configs loaded
-     */
     private void setConfigsLoadedFromFile(boolean loaded) {
         this._loaded = loaded;
     }
@@ -284,22 +272,22 @@ public class RobotConfigs {
     }
 
     /**
-     * saves configurable (probably should just read method name)
+     * Run the saveConfigurable method of the Configurable
      */
     public void saveConfigurable(String category, Configurable configurable) {
         configurable.saveConfigs(new ConfigsWrapper(category, this));
     }
 
     /**
-     * loads configurable
+     * Runs the loadConfigurable method of the given Configurable.
      */
     public void loadConfigurable(String category, Configurable configurable) {
         configurable.loadConfigs(new ConfigsWrapper(category, this));
     }
 
     /**
-     * Adds desired subsystem configurable to registry
-     * @param category desired subsystem
+     * Adds configurable to ConfigurableRegistry
+     * @param category category key name
      * @param configurable loaded config
      */
     public void addConfigurable(String category, Configurable configurable) {
@@ -323,7 +311,6 @@ public class RobotConfigs {
         }
 
         private void updateAll() {
-            System.out.println("Updating");
             for (Map.Entry<String, Configurable> entry : _configurables.entrySet()) {
                 entry.getValue().loadConfigs(new ConfigsWrapper(entry.getKey(), RobotConfigs.getInstance()));
             }
