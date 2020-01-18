@@ -8,6 +8,8 @@ import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
+import static com.revrobotics.ControlType.*;
+
 public class PIDSparkMax extends WL_SparkMax implements Configurable {
 
     private ControlType _controlType;
@@ -19,6 +21,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
     private double _setpoint;
 
     private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
+    //Smart motion variables
+    private double minVel, maxVel, maxAcc, allowedError;
+    private CANPIDController.AccelStrategy accelStrategy;
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -44,6 +49,12 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         this.kMaxOutput = this._controller.getOutputMax();
         this.kMinOutput = this._controller.getOutputMin();
         this.kIMaxAccum = this._controller.getIMaxAccum(0);
+        this.maxVel = this._controller.getSmartMotionMaxVelocity(0);
+        this.minVel = this._controller.getSmartMotionMinOutputVelocity(0);
+        this.maxAcc = this._controller.getSmartMotionMaxAccel(0);
+        this.allowedError = this._controller.getSmartMotionAllowedClosedLoopError(0);
+        this.accelStrategy = this._controller.getSmartMotionAccelStrategy(0);
+
     }
 
     public void setFeedbackDevice(CANEncoder feedbackDevice) {
@@ -116,6 +127,61 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
             _controller.setFF(kF);
             this.kF = kF;
         }
+    }
+
+    public double getMaxVel() {
+        return this.maxVel;
+    }
+
+    public void setMaxVel(double maxVel) {
+        if (maxVel != this.maxVel) {
+            _controller.setSmartMotionMaxVelocity(maxVel, 0);
+            this.maxVel = maxVel;
+        }
+
+    }
+
+    public double getMinVel() {
+        return this.minVel;
+    }
+
+    public void setMinVel(double minVel) {
+        if (minVel != this.minVel){
+            _controller.setSmartMotionMinOutputVelocity(minVel, 0);
+            this.minVel = minVel;
+        }
+    }
+
+    public double getMaxAcc() {
+        return this.maxAcc;
+    }
+
+    public void setMaxAcc(double maxAcc) {
+        if (maxAcc != this.maxAcc) {
+            _controller.setSmartMotionMaxAccel(maxAcc, 0);
+            this.maxAcc = maxAcc;
+        }
+
+    }
+
+    public double getAllowedError() {
+        return this.allowedError;
+    }
+    public void setAllowedError(double allowedError) {
+        if (allowedError != this.allowedError) {
+            _controller.setSmartMotionAllowedClosedLoopError(allowedError, 0);
+            this.allowedError = allowedError;
+        }
+
+    }
+
+    public void setAccelStrategy(CANPIDController.AccelStrategy accelStrategy) {
+        _controller.setSmartMotionAccelStrategy(accelStrategy, 0);
+        this.accelStrategy = accelStrategy;
+    }
+
+    public CANPIDController.AccelStrategy getAccelStrategy() {
+        return this.accelStrategy;
     }
 
     public double getMaxOutput() {
@@ -201,7 +267,25 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         _encoder.setPosition(0);
     }
 
+    public double getOutput(ControlType controlType) {
+        switch (controlType) {
+            case kCurrent:
+                return this.getOutputCurrent();
+            case kSmartVelocity:
+            case kVelocity:
+                return _encoder.getVelocity();
+            case kSmartMotion:
+            case kPosition:
+                return _encoder.getPosition();
+            case kVoltage:
+                return this.getBusVoltage();
+            case kDutyCycle:
+                return this.getAppliedOutput();
+            default:
+                return 0;
 
+        }
+    }
 
     /**
      * Get output depending on the {@link ControlType}
@@ -235,7 +319,22 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
         builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
+        builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.addDoubleProperty("output", this::getOutput, null);
+        builder.addDoubleProperty("PWM output", this::get, null);
+        if (this._controlType != kCurrent) {
+            builder.addDoubleProperty("Current output", this::getOutputCurrent, null);
+        }
+
+        if(this._controlType == kSmartMotion){
+            builder.addDoubleProperty("Max velocity", this::getMaxVel, this::setMaxVel);
+            builder.addDoubleProperty("Min velocity", this::getMinVel, this::setMinVel);
+            builder.addDoubleProperty("Max acceleration", this::getMaxAcc, this::setMaxAcc);
+            builder.addDoubleProperty("Allowed error", this::getAllowedError,this::setAllowedError);
+        }
+
+
     }
 
     @Override
