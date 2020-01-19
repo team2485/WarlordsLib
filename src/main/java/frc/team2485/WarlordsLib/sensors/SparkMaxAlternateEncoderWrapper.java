@@ -47,4 +47,8 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
             DriverStation.reportWarning(error.toString(), true);
         }
     }
+
+    public CANEncoder getEncoder() {
+        return encoder;
+    }
 }
