@@ -20,6 +20,7 @@ public class WL_TalonSRX extends WPI_TalonSRX {
     public WL_TalonSRX(int deviceNumber) {
         super(deviceNumber);
         this.configFactoryDefault();
+        this.clearStickyFaults();
     }
 
     /**
