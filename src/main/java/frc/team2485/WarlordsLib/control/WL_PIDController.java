@@ -7,9 +7,18 @@ import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
+/**
+ * PID controller with:
+ *      Configurable implementation
+ *      Feedforward term
+ *      Min and max output
+ */
 public class WL_PIDController extends PIDController implements Configurable {
 
     private double m_Kf = 0;
+
+    private double m_minOutput = 0;
+    private double m_maxOutput = 0;
 
     public WL_PIDController() {
         super(0,0,0);
@@ -53,16 +62,39 @@ public class WL_PIDController extends PIDController implements Configurable {
      */
     @Override
     public double calculate(double measurement) {
-        return super.calculate(measurement) + m_Kf * this.getSetpoint();
+        double output = super.calculate(measurement) + m_Kf * this.getSetpoint();
+
+        if (m_minOutput != m_maxOutput) {
+            return MathUtil.clamp(output, m_minOutput, m_maxOutput);
+        }
+
+        return output;
     }
 
-    public double calculateClamped(double measurement, double minOutput, double maxOutput) {
-        return MathUtil.clamp(calculate(measurement), minOutput, maxOutput);
+    /**
+     * Set output range of controller
+     * @param minOutput min output of controller
+     * @param maxOutput max output of controller
+     */
+    public void setOutputRange(double minOutput, double maxOutput) {
+        this.m_minOutput = minOutput;
+        this.m_maxOutput = maxOutput;
     }
 
-    public double calculateClamped(double measurement, double setpoint, double minOutput, double maxOutput) {
-        this.setSetpoint(setpoint);
-        return calculateClamped(measurement, minOutput, maxOutput);
+    /**
+     * Get min output of controller
+     * @return min output
+     */
+    public double getMinOutput() {
+        return this.m_minOutput;
+    }
+
+    /**
+     * Get max output of controller
+     * @return max output
+     */
+    public double getMaxOutput() {
+        return this.m_maxOutput;
     }
 
     @Override

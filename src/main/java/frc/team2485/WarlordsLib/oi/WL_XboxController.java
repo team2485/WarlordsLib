@@ -37,22 +37,22 @@ public class WL_XboxController extends XboxController {
     }
 
     /**
-     * Returns JoystickAxisButton
+     * Returns AxisButton
      * @param port port number of axis/joystick
      * @param threshold threshold of JoystickAxis
-     * @return JoystickAxisButton
+     * @return AxisButton
      */
-    public JoystickAxisButton getJoystickAxisButton(int port, double threshold) {
-        return new JoystickAxisButton(this, port, threshold);
+    public AxisButton getJoystickAxisButton(int port, double threshold) {
+        return new AxisButton(this, port, threshold);
     }
 
     /**
-     * Returns JoystickAxisButton
+     * Returns AxisButton
      * @param axis XboxJoystick joystick axis
      * @param threshold threshold of JoystickAxis
-     * @return JoystickAxisButton
+     * @return AxisButton
      */
-    public JoystickAxisButton getJoystickAxisButton(Axis axis, double threshold) {
+    public AxisButton getJoystickAxisButton(Axis axis, double threshold) {
         return getJoystickAxisButton(axis.value, threshold);
     }
 

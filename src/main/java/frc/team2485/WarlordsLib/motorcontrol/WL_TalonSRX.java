@@ -38,7 +38,7 @@ public class WL_TalonSRX extends WPI_TalonSRX {
     }
 
     /**
-     *
+     * Config all current limits
      * @param peakCurrentLimit Peak current limit
      * @param peakCurrentDuration Peak current limit duration (milliseconds)
      * @param continuousCurrentLimit Continuous current limit
@@ -51,6 +51,12 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         this.enableCurrentLimit(currentLimitsEnabled);
     }
 
+    /**
+     * Config all current limits
+     * @param peakCurrentLimit Peak current limit
+     * @param peakCurrentDuration Peak current limit duration (milliseconds)
+     * @param continuousCurrentLimit Continuous current limit
+    s */
     public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit) {
         setCurrentLimiting(peakCurrentLimit, peakCurrentDuration, continuousCurrentLimit, true);
     }

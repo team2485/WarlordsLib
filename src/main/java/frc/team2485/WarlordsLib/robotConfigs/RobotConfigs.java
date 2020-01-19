@@ -1,8 +1,6 @@
 package frc.team2485.WarlordsLib.robotConfigs;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import java.io.*;
 import java.util.Map;
@@ -15,15 +13,15 @@ import java.util.WeakHashMap;
  */
 public class RobotConfigs {
 
-    private static volatile RobotConfigs _instance;
-
-    private RobotConfigsMap _configs;
-
-    private ConfigurableRegistry _configurableRegistry;
-
     private static final String DEFAULT_CSV_SEPARATOR = ",";
 
-    private boolean _loaded;
+    private static volatile RobotConfigs m_instance;
+
+    private RobotConfigsMap m_configs;
+
+    private ConfigurableRegistry m_configurableRegistry;
+
+    private boolean m_fileLoaded;
 
     /**
      * Instantiates RobotConfigs singleton. Does NOT load configs from file; please use {@link #loadConfigsFromFile(String)}
@@ -31,28 +29,28 @@ public class RobotConfigs {
      * @return Singleton instance of RobotConfigs
      */
     public static RobotConfigs getInstance() {
-        if (_instance == null) {
+        if (m_instance == null) {
             synchronized (RobotConfigs.class) {
-                if (_instance == null) {
-                    _instance = new RobotConfigs();
+                if (m_instance == null) {
+                    m_instance = new RobotConfigs();
                 }
             }
         }
-        return _instance;
+        return m_instance;
     }
 
     private RobotConfigs() {
-        _configs = new RobotConfigsMap();
-        _configurableRegistry = new ConfigurableRegistry();
-        _loaded = false;
+        m_configs = new RobotConfigsMap();
+        m_configurableRegistry = new ConfigurableRegistry();
+        m_fileLoaded = false;
     }
 
     private boolean configsLoadedFromFile() {
-        return this._loaded;
+        return this.m_fileLoaded;
     }
 
     private void setConfigsLoadedFromFile(boolean loaded) {
-        this._loaded = loaded;
+        this.m_fileLoaded = loaded;
     }
 
     /**
@@ -70,7 +68,7 @@ public class RobotConfigs {
      * @param separator delimiter used in file
      */
     public void loadConfigsFromFile(String filepath, String separator) {
-        _configs.clear();
+        m_configs.clear();
         File file = new File(filepath);
         try {
             if (file.createNewFile()) {
@@ -85,7 +83,7 @@ public class RobotConfigs {
             while ((row = reader.readLine()) != null) {
                 String[] data = row.split(separator);
                 if (data.length == 3) {
-                    _configs.put(data[0].trim(), data[1].trim(), data[2]);
+                    m_configs.put(data[0].trim(), data[1].trim(), data[2]);
                 }
             }
             setConfigsLoadedFromFile(true);
@@ -93,7 +91,7 @@ public class RobotConfigs {
             e.printStackTrace();
         }
 
-        _configurableRegistry.updateAll();
+        m_configurableRegistry.updateAll();
     }
 
     /**
@@ -112,17 +110,17 @@ public class RobotConfigs {
      */
     public void saveConfigsToFile(String filepath, String separator) {
 
-        _configurableRegistry.saveAll();
+        m_configurableRegistry.saveAll();
 
         try (FileWriter writer = new FileWriter(filepath)) {
-            for (String category : _configs.keySet()) {
-                for (String key : _configs.keySet(category)) {
-                    if (_configs.containsKey(category, key)) {
+            for (String category : m_configs.keySet()) {
+                for (String key : m_configs.keySet(category)) {
+                    if (m_configs.containsKey(category, key)) {
                         writer.append(category);
                         writer.append(separator);
                         writer.append(key);
                         writer.append(separator);
-                        writer.append(_configs.get(category, key));
+                        writer.append(m_configs.get(category, key));
                         writer.append("\n");
                     }
                 }
@@ -143,7 +141,7 @@ public class RobotConfigs {
      */
     public String getString(String category, String key, String backup) {
         checkConfigsLoaded();
-        return _configs.getStringOrBackup(category, key, backup);
+        return m_configs.getStringOrBackup(category, key, backup);
     }
 
     /**
@@ -154,7 +152,7 @@ public class RobotConfigs {
      */
     public double getDouble(String category, String key, double backup) {
         checkConfigsLoaded();
-        return _configs.getDoubleOrBackup(category, key, backup);
+        return m_configs.getDoubleOrBackup(category, key, backup);
     }
 
     /**
@@ -165,7 +163,7 @@ public class RobotConfigs {
      */
     public int getInt(String category, String key, int backup) {
         checkConfigsLoaded();
-        return _configs.getIntOrBackup(category, key, backup);
+        return m_configs.getIntOrBackup(category, key, backup);
     }
 
     /**
@@ -176,7 +174,7 @@ public class RobotConfigs {
      */
     public float getFloat(String category, String key, float backup) {
         checkConfigsLoaded();
-        return _configs.getFloatOrBackup(category, key, backup);
+        return m_configs.getFloatOrBackup(category, key, backup);
     }
 
     /**
@@ -187,7 +185,7 @@ public class RobotConfigs {
      */
     public long getLong(String category, String key, long backup) {
         checkConfigsLoaded();
-        return _configs.getLongOrBackup(category, key, backup);
+        return m_configs.getLongOrBackup(category, key, backup);
     }
 
     /**
@@ -198,7 +196,7 @@ public class RobotConfigs {
      */
     public boolean getBoolean(String category, String key, boolean backup) {
         checkConfigsLoaded();
-        return _configs.getBooleanOrBackup(category, key, backup);
+        return m_configs.getBooleanOrBackup(category, key, backup);
     }
 
     /**
@@ -218,7 +216,7 @@ public class RobotConfigs {
      * @param value value for constant
      */
     public void put(String category, String key, String value) {
-        _configs.put(category, key, value);
+        m_configs.put(category, key, value);
     }
 
     /**
@@ -228,7 +226,7 @@ public class RobotConfigs {
      * @param value value for constant
      */
     public void put(String category, String key, double value) {
-        _configs.put(category, key, Double.toString(value));
+        m_configs.put(category, key, Double.toString(value));
     }
 
     /**
@@ -238,7 +236,7 @@ public class RobotConfigs {
      * @param value value for constant
      */
     public void put(String category, String key, float value) {
-        _configs.put(category, key, Float.toString(value));
+        m_configs.put(category, key, Float.toString(value));
     }
 
     /**
@@ -248,7 +246,7 @@ public class RobotConfigs {
      * @param value value for constant
      */
     public void put(String category, String key, int value) {
-        _configs.put(category, key, Integer.toString(value));
+        m_configs.put(category, key, Integer.toString(value));
     }
 
     /**
@@ -258,7 +256,7 @@ public class RobotConfigs {
      * @param value value for constant
      */
     public void put(String category, String key, long value) {
-        _configs.put(category, key, Long.toString(value));
+        m_configs.put(category, key, Long.toString(value));
     }
 
     /**
@@ -268,7 +266,7 @@ public class RobotConfigs {
      * @param value value for constant
      */
     public void put(String category, String key, boolean value) {
-        _configs.put(category, key, Boolean.toString(value));
+        m_configs.put(category, key, Boolean.toString(value));
     }
 
     /**
@@ -291,7 +289,7 @@ public class RobotConfigs {
      * @param configurable loaded config
      */
     public void addConfigurable(String category, Configurable configurable) {
-        _configurableRegistry.addConfigurable(category, configurable);
+        m_configurableRegistry.addConfigurable(category, configurable);
     }
 
     /**

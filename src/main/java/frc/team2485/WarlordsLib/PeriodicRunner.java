@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class PeriodicRunner {
 
-    private double _seconds;
+    private double m_seconds;
 
-    private Runnable _runnable;
+    private Runnable m_runnable;
 
-    private Timer _timer;
+    private Timer m_timer;
 
     /**
      * Runs a given method periodically by a given amount of seconds.
@@ -19,20 +19,20 @@ public class PeriodicRunner {
      * @param seconds seconds in between each call.
      */
     public PeriodicRunner(Runnable runnable, double seconds) {
-        this._runnable = runnable;
-        this._seconds = seconds;
-        this._timer = new Timer();
-        _timer.reset();
-        _timer.start();
+        this.m_runnable = runnable;
+        this.m_seconds = seconds;
+        this.m_timer = new Timer();
+        m_timer.reset();
+        m_timer.start();
     }
 
     /**
      * Run the periodic runner, which will only run the runner every given amount of seconds.
      */
     public void run() {
-        if (_timer.get() > _seconds) {
-            _runnable.run();
-            _timer.reset();
+        if (m_timer.get() > m_seconds) {
+            m_runnable.run();
+            m_timer.reset();
         }
     }
 

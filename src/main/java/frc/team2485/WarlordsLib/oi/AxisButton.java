@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj2.command.button.Button;
  * @author Nicholas Contreras
  * @author Nathan Sariowan
  */
-public class JoystickAxisButton extends Button {
+public class AxisButton extends Button {
 
-    private double _threshold;
-    private GenericHID _joystick;
-    private int _port;
+    private double m_threshold;
+    private GenericHID m_joystick;
+    private int m_port;
 
     /**
      * 
@@ -24,25 +24,24 @@ public class JoystickAxisButton extends Button {
      *                  trigger when the joystick is below the threshold; otherwise, it will trigger when the joystick
      *                  is above the threshold.
      */
-    public JoystickAxisButton(GenericHID joystick, int port, double threshold) {
+    public AxisButton(GenericHID joystick, int port, double threshold) {
         super();
-        this._threshold = threshold;
-        this._joystick = joystick;
-        this._port = port;
+        this.m_threshold = threshold;
+        this.m_joystick = joystick;
+        this.m_port = port;
     }
 
     /**
      * Returns true if the joystick value is greater than the given threshold.
-     * If the _threshold is negative, returns true if joystick value is less than the given threshold.
+     * If the m_threshold is negative, returns true if joystick value is less than the given threshold.
      */
     @Override
     public boolean get() {
-        double joystickVal = this._joystick.getRawAxis(this._port);
+        double joystickVal = this.m_joystick.getRawAxis(this.m_port);
 
-        if (_threshold < 0) {
-            return joystickVal <= _threshold;
-        } else {
-            return joystickVal >= _threshold;
+        if (m_threshold < 0) {
+            return joystickVal <= m_threshold;
         }
+        return joystickVal >= m_threshold;
     }
 }

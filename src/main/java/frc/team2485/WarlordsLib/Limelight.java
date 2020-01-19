@@ -2,12 +2,11 @@ package frc.team2485.WarlordsLib;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
 
 public class Limelight {
 
-    private NetworkTableInstance _networkTableInstance;
-    private NetworkTable _limelightTable;
+    private NetworkTableInstance m_networkTableInstance;
+    private NetworkTable m_limelightTable;
 
     private enum LimelightVersion {
         ONE(54, 41), TWO(59.6, 49.7);
@@ -29,16 +28,16 @@ public class Limelight {
         }
     }
 
-    private LimelightVersion _limelightVersion;
+    private LimelightVersion m_limelightVersion;
 
     /**
      * Wrapper for Limelight.
      * @param limelightVersion version of this limelight.
      */
     public Limelight(LimelightVersion limelightVersion) {
-        _limelightVersion = limelightVersion;
-        _networkTableInstance = NetworkTableInstance.getDefault();
-        _limelightTable = _networkTableInstance.getTable("limelight");
+        m_limelightVersion = limelightVersion;
+        m_networkTableInstance = NetworkTableInstance.getDefault();
+        m_limelightTable = m_networkTableInstance.getTable("limelight");
     }
 
     /**
@@ -49,7 +48,7 @@ public class Limelight {
     }
 
     public LimelightVersion getLimelightVersion() {
-        return this._limelightVersion;
+        return this.m_limelightVersion;
     }
     /**
      * Whether Limelight has any valid targets
@@ -144,7 +143,7 @@ public class Limelight {
      * @return position array
      */
     public double[] getCameraTranslation() {
-        return _limelightTable.getEntry("camtran").getDoubleArray(new double[6]);
+        return m_limelightTable.getEntry("camtran").getDoubleArray(new double[6]);
     }
 
     private enum LedMode {
@@ -218,7 +217,7 @@ public class Limelight {
      * @return number array
      */
     public Number[] getCornerYCoordinates() {
-        return _limelightTable.getEntry("tcorny").getNumberArray(new Number[0]);
+        return m_limelightTable.getEntry("tcorny").getNumberArray(new Number[0]);
     }
 
     /**
@@ -226,7 +225,7 @@ public class Limelight {
      * @return number array
      */
     public Number[] getCornerXCoordinates() {
-        return _limelightTable.getEntry("tcornx").getNumberArray(new Number[0]);
+        return m_limelightTable.getEntry("tcornx").getNumberArray(new Number[0]);
     }
 
     /**
@@ -263,7 +262,7 @@ public class Limelight {
      * @return normalized screenspace
      */
     public double getCrosshairX(int crosshair, double defaultValue) {
-        return _limelightTable.getEntry("cx" + crosshair).getDouble(defaultValue);
+        return m_limelightTable.getEntry("cx" + crosshair).getDouble(defaultValue);
     }
 
     /**
@@ -272,7 +271,7 @@ public class Limelight {
      * @return normalized screenspace
      */
     public double getCrosshairY(int crosshair, double defaultValue) {
-        return _limelightTable.getEntry("cy" + crosshair).getDouble(defaultValue);
+        return m_limelightTable.getEntry("cy" + crosshair).getDouble(defaultValue);
     }
 
     /**
@@ -284,11 +283,22 @@ public class Limelight {
         return getDoubleProperty("tx" + target, defaultValue);
     }
 
+    /**
+     * Get a particular double from the Limelight not offered by the methods.
+     * @param key String NetworkTables key
+     * @param defaultValue defaultValue if not found
+     * @return double property
+     */
     public double getDoubleProperty(String key, double defaultValue) {
-        return _limelightTable.getEntry(key).getDouble(defaultValue);
+        return m_limelightTable.getEntry(key).getDouble(defaultValue);
     }
 
+    /**
+     * Set a particular number to Limelight not offered in methods
+     * @param key String NetworkTablesKey
+     * @param n number
+     */
     public void setNumberProperty(String key, Number n) {
-        _limelightTable.getEntry(key).setNumber(n);
+        m_limelightTable.getEntry(key).setNumber(n);
     }
 }
