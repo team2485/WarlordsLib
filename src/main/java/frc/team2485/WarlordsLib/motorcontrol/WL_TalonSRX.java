@@ -1,5 +1,6 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -18,13 +19,8 @@ public class WL_TalonSRX extends WPI_TalonSRX {
      */
     public WL_TalonSRX(int deviceNumber) {
         super(deviceNumber);
-    }
-
-    public WL_TalonSRX(int deviceNumber, boolean isInverted) {
-        super(deviceNumber);
         this.configFactoryDefault();
         this.clearStickyFaults();
-        this.setInverted(isInverted);
     }
 
     /**

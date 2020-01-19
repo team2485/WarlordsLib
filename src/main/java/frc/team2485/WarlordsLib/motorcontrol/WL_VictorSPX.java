@@ -16,6 +16,7 @@ public class WL_VictorSPX extends WPI_VictorSPX {
     public WL_VictorSPX(int deviceNumber) {
         super(deviceNumber);
         this.configFactoryDefault();
+        this.clearStickyFaults();
     }
 
     /**
