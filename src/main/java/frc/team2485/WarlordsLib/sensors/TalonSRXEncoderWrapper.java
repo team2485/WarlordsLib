@@ -10,34 +10,25 @@ public class TalonSRXEncoderWrapper implements Encoder {
 
 
     public enum TalonSRXEncoderType {
-        ABSOLUTE(4096), QUADRATURE(250), ANALOG(1024);
-
-        private int defaultCPR;
-
-        private TalonSRXEncoderType(int defaultCPR) {
-            this.defaultCPR = defaultCPR;
-        }
+        ABSOLUTE, QUADRATURE, ANALOG
     }
 
     private double distancePerRevolution = 1;
 
-    private double ticksPerRevolution;
-
-    private TalonSRX talon;
+    private double pulsesPerRevolution;
 
     private SensorCollection sensor;
 
     private TalonSRXEncoderType encoderType;
 
-    public TalonSRXEncoderWrapper(TalonSRX motorController, TalonSRXEncoderType encoderType, int ticksPerRevolution) {
-        this.talon = motorController;
-        this.ticksPerRevolution = ticksPerRevolution;
+    public TalonSRXEncoderWrapper(TalonSRX motorController, TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
+        this.pulsesPerRevolution = pulsesPerRevolution;
         this.encoderType = encoderType;
-        this.sensor = talon.getSensorCollection();
+        this.sensor = motorController.getSensorCollection();
     }
 
-    public TalonSRXEncoderWrapper(TalonSRX motorController, TalonSRXEncoderType encoderType) {
-        this(motorController, encoderType, encoderType.defaultCPR);
+    public TalonSRXEncoderWrapper(int deviceId, TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
+        this(new TalonSRX(deviceId), encoderType, pulsesPerRevolution);
     }
 
     @Override
@@ -94,10 +85,10 @@ public class TalonSRXEncoderWrapper implements Encoder {
     }
 
     private int convertDistanceToTicks(double distance) {
-        return (int) (distance * ticksPerRevolution / distancePerRevolution);
+        return (int) (distance * pulsesPerRevolution / distancePerRevolution);
     }
 
     private double convertTicksToDistance(int ticks) {
-        return ticks * distancePerRevolution / ticksPerRevolution;
+        return ticks * distancePerRevolution / pulsesPerRevolution;
     }
 }
