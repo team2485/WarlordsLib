@@ -5,16 +5,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class SparkMaxAlternateEncoderWrapper implements Encoder {
 
-    private double distancePerRevolution = 1;
-
-    private double pulsesPerRevolution;
-
-    private CANEncoder encoder;
+    private CANEncoder m_encoder;
 
     public SparkMaxAlternateEncoderWrapper(CANSparkMax spark, int pulsesPerRevolution) {
-        this.pulsesPerRevolution = pulsesPerRevolution;
-
-        this.encoder = spark.getAlternateEncoder(AlternateEncoderType.kQuadrature, pulsesPerRevolution);
+        this.m_encoder = spark.getAlternateEncoder(AlternateEncoderType.kQuadrature, pulsesPerRevolution);
     }
 
     public SparkMaxAlternateEncoderWrapper(int deviceId, int pulsesPerRevolution) {
@@ -27,7 +21,7 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
      */
     @Override
     public double getPosition() {
-        return encoder.getPosition();
+        return m_encoder.getPosition();
     }
 
     /**
@@ -36,7 +30,7 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
      */
     @Override
     public void setPosition(double position) {
-        handleCANError(encoder.setPosition(position));
+        handleCANError(m_encoder.setPosition(position));
     }
 
     /**
@@ -45,8 +39,8 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
      */
     @Override
     public void setDistancePerRevolution(double distance) {
-        handleCANError(encoder.setPositionConversionFactor(distance));
-        handleCANError(encoder.setVelocityConversionFactor(distance));
+        handleCANError(m_encoder.setPositionConversionFactor(distance));
+        handleCANError(m_encoder.setVelocityConversionFactor(distance));
     }
 
     /**
@@ -55,7 +49,7 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
      */
     @Override
     public double getVelocity() {
-        return encoder.getVelocity() / 60; // from distance per minute to distance per second
+        return m_encoder.getVelocity() / 60; // from distance per minute to distance per second
     }
 
     private void handleCANError(CANError error) {
@@ -69,7 +63,7 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
      * @param inverted whether encoder is inverted
      */
     public void setInverted(boolean inverted) {
-        encoder.setInverted(inverted);
+        m_encoder.setInverted(inverted);
     }
 
     /**
@@ -77,6 +71,6 @@ public class SparkMaxAlternateEncoderWrapper implements Encoder {
      * @return the CANEncoder
      */
     public CANEncoder getEncoder() {
-        return encoder;
+        return m_encoder;
     }
 }
