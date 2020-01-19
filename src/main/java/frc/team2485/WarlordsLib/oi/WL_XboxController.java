@@ -8,22 +8,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class WL_XboxController extends XboxController {
 
-    public enum Joystick {
-        kXLeft(0),
-        kXRight(4),
-        kYLeft(1),
-        kYRight(5),
-        kTriggerLeft(2),
-        kTriggerRight(3);
-
-        @SuppressWarnings({"MemberName", "PMD.SingularField"})
-        private final int value;
-
-        Joystick(int value) {
-            this.value = value;
-        }
-    }
-
     /**
      * Construct an instance of a joystick. The joystick index is the USB port on the drivers
      * station.
@@ -64,12 +48,12 @@ public class WL_XboxController extends XboxController {
 
     /**
      * Returns JoystickAxisButton
-     * @param joystick XboxJoystick joystick axis
+     * @param axis XboxJoystick joystick axis
      * @param threshold threshold of JoystickAxis
      * @return JoystickAxisButton
      */
-    public JoystickAxisButton getJoystickAxisButton(Joystick joystick, double threshold) {
-        return getJoystickAxisButton(joystick.value, threshold);
+    public JoystickAxisButton getJoystickAxisButton(Axis axis, double threshold) {
+        return getJoystickAxisButton(axis.value, threshold);
     }
 
 }
