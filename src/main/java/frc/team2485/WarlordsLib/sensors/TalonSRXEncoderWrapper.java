@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
- * Copied from previous year; @todo look at available SensorCollection methods
+ * Copied from previous year;
  */
 public class TalonSRXEncoderWrapper implements Encoder {
 
@@ -31,6 +31,10 @@ public class TalonSRXEncoderWrapper implements Encoder {
         this(new TalonSRX(deviceId), encoderType, pulsesPerRevolution);
     }
 
+    /**
+     * Get position of encoder according to set distance per revolution
+     * @return position
+     */
     @Override
     public double getPosition() {
         switch (encoderType) {
@@ -45,6 +49,10 @@ public class TalonSRXEncoderWrapper implements Encoder {
         }
     }
 
+    /**
+     * Reset encoder position
+     * @param position position to set to
+     */
     @Override
     public void setPosition(double position) {
         switch (encoderType) {
@@ -60,6 +68,10 @@ public class TalonSRXEncoderWrapper implements Encoder {
         }
     }
 
+    /**
+     *  Set scaling factor for encoder
+     * @param distance distance per revolution
+     */
     @Override
     public void setDistancePerRevolution(double distance) {
         this.distancePerRevolution = distance;

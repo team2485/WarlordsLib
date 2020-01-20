@@ -2,6 +2,7 @@ package frc.team2485.WarlordsLib.subsystems;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -9,20 +10,27 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class SpeedControllerSubsystem extends SubsystemBase {
 
-    private SpeedControllerGroup _speedControllers;
+    private SpeedControllerGroup m_speedControllers;
 
     public SpeedControllerSubsystem(SpeedController speedController, SpeedController... speedControllers) {
-        _speedControllers = new SpeedControllerGroup(speedController, speedControllers);
-
-        addChild(_speedControllers);
+        m_speedControllers = new SpeedControllerGroup(speedController, speedControllers);
     }
 
     public void set(double speed) {
-        _speedControllers.set(speed);
+        m_speedControllers.set(speed);
+    }
+
+    public double get() {
+        return m_speedControllers.get();
     }
 
     public void stop() {
-        _speedControllers.stopMotor();
+        m_speedControllers.stopMotor();
     }
 
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.addDoubleProperty("Speed Controllers", this::get, this::set);
+    }
 }

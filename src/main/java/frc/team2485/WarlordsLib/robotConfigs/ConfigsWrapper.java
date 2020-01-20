@@ -6,13 +6,11 @@ public class ConfigsWrapper implements LoadableConfigs, SavableConfigs {
 
     private String m_category;
 
-    // This is the constructor
-    public ConfigsWrapper(String category, RobotConfigs robotConfigsInstance) {
+    protected ConfigsWrapper(String category, RobotConfigs robotConfigsInstance) {
         this.m_category = category;
         this.m_robotConfigs = robotConfigsInstance;
     }
 
-    // Methods for getting config values by type
     @Override
     public String getString(String key, String backup) {
         return m_robotConfigs.getString(m_category, key, backup);
@@ -37,7 +35,6 @@ public class ConfigsWrapper implements LoadableConfigs, SavableConfigs {
     @Override
     public boolean getBoolean(String key, boolean backup) { return m_robotConfigs.getBoolean(m_category, key, backup); }
 
-    // Methods for setting config values by type
     @Override
     public void put(String key, String value) { m_robotConfigs.put(m_category, key, value); }
 

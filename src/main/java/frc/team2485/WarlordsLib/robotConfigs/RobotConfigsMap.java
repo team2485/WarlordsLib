@@ -17,7 +17,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key replace with constant name
      * @param value replace with value for constant
      */
-    public void put(String category, String key, String value) {
+    protected void put(String category, String key, String value) {
         key = key.trim();
         if (this.containsKey(category)) {
             this.get(category).put(key, value);
@@ -33,7 +33,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param category replace with subsystem
      * @param key replace with constant name
      */
-    public String get(String category, String key) {
+    protected String get(String category, String key) {
         key = key.trim();
         if (containsKey(category, key)) {
             return this.get(category).get(key);
@@ -47,7 +47,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key name of constant
      * @param backup value of backup constant
      */
-    public String getStringOrBackup(String category, String key, String backup) {
+    protected String getStringOrBackup(String category, String key, String backup) {
         if (containsKey(category, key)) {
             return get(category,key);
         }
@@ -62,7 +62,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key name of constant
      * @param backup value of backup constant
      */
-    public double getDoubleOrBackup(String category, String key, double backup) {
+    protected double getDoubleOrBackup(String category, String key, double backup) {
         if (containsKey(category, key)) {
             try {
                 return Double.parseDouble(get(category, key).trim());
@@ -83,7 +83,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key name of constant
      * @param backup value of backup constant
      */
-    public int getIntOrBackup(String category, String key, int backup) {
+    protected int getIntOrBackup(String category, String key, int backup) {
         if (containsKey(category, key)) {
             try {
                 return Integer.parseInt(get(category, key).trim());
@@ -104,7 +104,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key name of constant
      * @param backup value of backup constant
      */
-    public boolean getBooleanOrBackup(String category, String key, boolean backup) {
+    protected boolean getBooleanOrBackup(String category, String key, boolean backup) {
         if (containsKey(category, key)) {
             try {
                 return Boolean.parseBoolean(get(category, key).trim());
@@ -125,7 +125,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key name of constant
      * @param backup value of backup constant
      */
-    public float getFloatOrBackup(String category, String key, float backup) {
+    protected float getFloatOrBackup(String category, String key, float backup) {
         if (containsKey(category, key)) {
             try {
                 return Float.parseFloat(get(category, key).trim());
@@ -146,7 +146,7 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
      * @param key name of constant
      * @param backup value of backup constant
      */
-    public long getLongOrBackup(String category, String key, long backup) {
+    protected long getLongOrBackup(String category, String key, long backup) {
         if (containsKey(category, key)) {
             try {
                 return Long.parseLong(get(category, key).trim());
@@ -162,38 +162,23 @@ public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
         return backup;
     }
 
-    /**
-     * reports warning regarding given info in params
-     */
     private void reportWarning(String category, String key, String backup, String error) {
         DriverStation.reportWarning("RobotConfigsMap: Error in retrieving (" + category + ", " + key + "): " + error + "! Returning backup: " + backup + ".", false);
     }
 
-    /**
-     * reports "Not Found" warning
-     */
     private void reportWarningNotFound(String category, String key, String backup) {
         reportWarning(category, key, backup, "Not Found");
     }
 
-    /**
-     * returns true/false if provided category contains a certain key
-     */
-    public boolean containsKey(String category, String key) {
+    protected boolean containsKey(String category, String key) {
         return this.containsKey(category) && this.get(category).containsKey(key);
     }
 
-    /**
-     * returns true/false if key is in given category
-     */
-    public boolean containsCategory(String category) {
+    protected boolean containsCategory(String category) {
         return this.containsKey(category);
     }
 
-    /**
-     * sets key to given category
-     */
-    public Set<String> keySet(String category) {
+    protected Set<String> keySet(String category) {
         if (containsCategory(category)) {
             return this.get(category).keySet();
         }

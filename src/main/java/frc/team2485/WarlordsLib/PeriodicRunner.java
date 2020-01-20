@@ -35,6 +35,4 @@ public class PeriodicRunner {
             m_timer.reset();
         }
     }
-
-
 }

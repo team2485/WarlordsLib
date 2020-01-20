@@ -4,13 +4,12 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
-import static com.revrobotics.ControlType.*;
-
-public class PIDSparkMax extends WL_SparkMax implements Configurable {
+public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController {
 
     private ControlType m_controlType;
 
@@ -20,10 +19,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
 
     private double m_setpoint;
 
-    private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
-    //Smart motion variables
-    private double minVel, maxVel, maxAcc, allowedError;
-    private CANPIDController.AccelStrategy accelStrategy;
+    private double m_kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -41,7 +37,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
 
         this.m_controller.setIAccum(0);
 
-        this.kP = this.m_controller.getP();
+        this.m_kP = this.m_controller.getP();
         this.kI = this.m_controller.getI();
         this.kD = this.m_controller.getD();
         this.kIz = this.m_controller.getIZone();
@@ -49,35 +45,32 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         this.kMaxOutput = this.m_controller.getOutputMax();
         this.kMinOutput = this.m_controller.getOutputMin();
         this.kIMaxAccum = this.m_controller.getIMaxAccum(0);
-        this.maxVel = this.m_controller.getSmartMotionMaxVelocity(0);
-        this.minVel = this.m_controller.getSmartMotionMinOutputVelocity(0);
-        this.maxAcc = this.m_controller.getSmartMotionMaxAccel(0);
-        this.allowedError = this.m_controller.getSmartMotionAllowedClosedLoopError(0);
-        this.accelStrategy = this.m_controller.getSmartMotionAccelStrategy(0);
-
     }
 
     public void setFeedbackDevice(CANEncoder feedbackDevice) {
         this.m_encoder = feedbackDevice;
         m_controller.setFeedbackDevice(feedbackDevice);
     }
-
+    @Override
     public double getP() {
         return m_controller.getP();
     }
 
+    @Override
     public void setP(double kP) {
-        if (this.kP != kP) {
+        if (this.m_kP != kP) {
             m_controller.setP(kP);
-            this.kP = kP;
+            this.m_kP = kP;
         }
     }
 
+    @Override
     public double getI() {
         return m_controller.getI();
 
     }
 
+    @Override
     public void setI(double kI) {
         if (this.kI != kI) {
             m_controller.setI(kI);
@@ -85,10 +78,12 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         }
     }
 
+    @Override
     public double getD() {
         return m_controller.getD();
     }
 
+    @Override
     public void setD(double kD) {
         if (this.kD != kD) {
             m_controller.setD(kD);
@@ -129,61 +124,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         }
     }
 
-    public double getMaxVel() {
-        return this.maxVel;
-    }
-
-    public void setMaxVel(double maxVel) {
-        if (maxVel != this.maxVel) {
-            m_controller.setSmartMotionMaxVelocity(maxVel, 0);
-            this.maxVel = maxVel;
-        }
-
-    }
-
-    public double getMinVel() {
-        return this.minVel;
-    }
-
-    public void setMinVel(double minVel) {
-        if (minVel != this.minVel){
-            m_controller.setSmartMotionMinOutputVelocity(minVel, 0);
-            this.minVel = minVel;
-        }
-    }
-
-    public double getMaxAcc() {
-        return this.maxAcc;
-    }
-
-    public void setMaxAcc(double maxAcc) {
-        if (maxAcc != this.maxAcc) {
-            m_controller.setSmartMotionMaxAccel(maxAcc, 0);
-            this.maxAcc = maxAcc;
-        }
-
-    }
-
-    public double getAllowedError() {
-        return this.allowedError;
-    }
-    public void setAllowedError(double allowedError) {
-        if (allowedError != this.allowedError) {
-            m_controller.setSmartMotionAllowedClosedLoopError(allowedError, 0);
-            this.allowedError = allowedError;
-        }
-
-    }
-
-    public void setAccelStrategy(CANPIDController.AccelStrategy accelStrategy) {
-        m_controller.setSmartMotionAccelStrategy(accelStrategy, 0);
-        this.accelStrategy = accelStrategy;
-    }
-
-    public CANPIDController.AccelStrategy getAccelStrategy() {
-        return this.accelStrategy;
-    }
-
     public double getMaxOutput() {
         return m_controller.getOutputMax();
     }
@@ -199,7 +139,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
     }
 
     public void setPIDF(double p, double i, double d, double f) {
-        if ((this.kP != kP) || (this.kI != kI) || (this.kD != kD) || (this.kF != kF)) {
+        if ((this.m_kP != m_kP) || (this.kI != kI) || (this.kD != kD) || (this.kF != kF)) {
             m_controller.setP(p);
             m_controller.setI(i);
             m_controller.setD(d);
@@ -226,13 +166,14 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         this.m_controlType = controlType;
     }
 
-    public void setReference() {
+    @Override
+    public void runPID() {
         m_controller.setReference(m_setpoint, m_controlType);
     }
 
-    public void setReference(double target) {
+    public void runPID(double target) {
         setSetpoint(target);
-        setReference();
+        runPID();
     }
 
     public CANPIDController getController() {
@@ -248,9 +189,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
      * (RPM) Position Control: Position (Rotations) Current Control: Current
      * (Amps). Native units can be changed using the setPositionConversionFactor()
      * or setVelocityConversionFactor() methods of the CANEncoder class
-     *
-     *
      */
+    @Override
     public void setSetpoint(double setpoint) {
         this.m_setpoint = setpoint;
     }
@@ -259,12 +199,14 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         return this.m_setpoint;
     }
 
+    @Override
     public void reset() {
         this.m_controller.setIAccum(0);
     }
 
-    public void zero() {
-        m_encoder.setPosition(0);
+    @Override
+    public void setEncoderPosition(double position) {
+        m_encoder.setPosition(position);
     }
 
     public double getOutput(ControlType controlType) {
@@ -283,7 +225,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
                 return this.getAppliedOutput();
             default:
                 return 0;
-
         }
     }
 
@@ -291,6 +232,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
      * Get output depending on the {@link ControlType}
      * @return output of pid
      */
+    @Override
     public double getOutput()  {
         switch (m_controlType) {
             case kCurrent:
@@ -321,20 +263,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
         builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-        builder.addDoubleProperty("output", this::getOutput, null);
-        builder.addDoubleProperty("PWM output", this::get, null);
-        if (this.m_controlType != kCurrent) {
-            builder.addDoubleProperty("Current output", this::getOutputCurrent, null);
-        }
-
-        if(this.m_controlType == kSmartMotion){
-            builder.addDoubleProperty("Max velocity", this::getMaxVel, this::setMaxVel);
-            builder.addDoubleProperty("Min velocity", this::getMinVel, this::setMinVel);
-            builder.addDoubleProperty("Max acceleration", this::getMaxAcc, this::setMaxAcc);
-            builder.addDoubleProperty("Allowed error", this::getAllowedError,this::setAllowedError);
-        }
-
-
     }
 
     @Override
@@ -356,6 +284,4 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable {
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
     }
-
-
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Singleton for saving robot configs/constants locally on roborio. Replaces ConstantsIO.
+ * Singleton for saving robot configs/constants locally on roborio. (Replaces ConstantsIO)
  *
  * Call me by using RobotConfigs.getInstance()
  */
@@ -199,10 +199,6 @@ public class RobotConfigs {
         return m_configs.getBooleanOrBackup(category, key, backup);
     }
 
-    /**
-     * Checks if configs have been loaded
-     * If not, reports relevant warning
-     */
     private void checkConfigsLoaded() {
         if (!configsLoadedFromFile()) {
             DriverStation.reportWarning("RobotConfigs has not loaded a file yet, so no constants have been loaded. Make sure to run method loadConfigsFromFile!", true);
@@ -292,9 +288,6 @@ public class RobotConfigs {
         m_configurableRegistry.addConfigurable(category, configurable);
     }
 
-    /**
-     * Registry of all Configurables.
-     */
     private class ConfigurableRegistry {
 
         private WeakHashMap<String, Configurable> _configurables;
@@ -320,5 +313,4 @@ public class RobotConfigs {
             }
         }
     }
-
 }
