@@ -3,7 +3,7 @@ package frc.team2485.WarlordsLib.sensors;
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class SparkMaxAlternateEncoderWrapper implements Encoder {
+public class SparkMaxAlternateEncoderWrapper implements EncoderWrapper {
 
     private CANEncoder m_encoder;
 

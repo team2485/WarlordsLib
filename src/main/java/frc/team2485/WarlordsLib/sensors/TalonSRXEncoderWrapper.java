@@ -6,7 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 /**
  * Copied from previous year;
  */
-public class TalonSRXEncoderWrapper implements Encoder {
+public class TalonSRXEncoderWrapper implements EncoderWrapper {
 
 
     public enum TalonSRXEncoderType {

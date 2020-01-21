@@ -1,6 +1,6 @@
 package frc.team2485.WarlordsLib.sensors;
 
-public interface Encoder {
+public interface EncoderWrapper {
 
     /**
      * Get position of the encoder scaled by setDistancePerRevolution

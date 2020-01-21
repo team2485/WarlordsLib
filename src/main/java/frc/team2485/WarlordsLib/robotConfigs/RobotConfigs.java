@@ -39,18 +39,21 @@ public class RobotConfigs {
         return m_instance;
     }
 
+    /**
+     * Private singleton constructor
+     */
     private RobotConfigs() {
         m_configs = new RobotConfigsMap();
         m_configurableRegistry = new ConfigurableRegistry();
         m_fileLoaded = false;
     }
 
-    private boolean configsLoadedFromFile() {
+    /**
+     * Returns true if RobotConfigs has successfully loaded from a file.
+     * @return m_fileLoaded
+     */
+    public boolean configsLoadedFromFile() {
         return this.m_fileLoaded;
-    }
-
-    private void setConfigsLoadedFromFile(boolean loaded) {
-        this.m_fileLoaded = loaded;
     }
 
     /**
@@ -86,7 +89,7 @@ public class RobotConfigs {
                     m_configs.put(data[0].trim(), data[1].trim(), data[2]);
                 }
             }
-            setConfigsLoadedFromFile(true);
+            this.m_fileLoaded = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -199,6 +202,9 @@ public class RobotConfigs {
         return m_configs.getBooleanOrBackup(category, key, backup);
     }
 
+    /**
+     * Report warning if RobotConfigs has not loaded a file yet.
+     */
     private void checkConfigsLoaded() {
         if (!configsLoadedFromFile()) {
             DriverStation.reportWarning("RobotConfigs has not loaded a file yet, so no constants have been loaded. Make sure to run method loadConfigsFromFile!", true);

@@ -23,7 +23,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     /**
      * Create a new Brushless SPARK MAX Controller
-     *
      * @param deviceID The device ID.
      */
     public PIDSparkMax(int deviceID, ControlType controlType) {
@@ -47,6 +46,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
     }
 
+    /**
+     * Set the PID's feedback device
+     * @param feedbackDevice feedbackDevice
+     */
     public void setFeedbackDevice(CANEncoder feedbackDevice) {
         this.m_encoder = feedbackDevice;
         m_controller.setFeedbackDevice(feedbackDevice);
@@ -54,7 +57,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     /**
      * gets the proportional coefficient
-     *
      * @return proportional coefficient
      */
     @Override
@@ -64,7 +66,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     /**
      * sets proportional coefficient
-     *
      * @param kP proportional coefficient
      */
     @Override
@@ -77,7 +78,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     /**
      * gets the Integral coefficient
-     *
      * @return integral coefficient
      */
     @Override
@@ -86,6 +86,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     }
 
+    /**
+     * Set integral coefficient
+     * @param kI integral coefficient
+     */
     @Override
     public void setI(double kI) {
         if (this.m_kI != kI) {
@@ -96,7 +100,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     /**
      * gets the Differential coefficient
-     *
      * @return differential coefficient
      */
     @Override
@@ -104,6 +107,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         return m_controller.getD();
     }
 
+    /**
+     * Set differential coefficient
+     * @param kD differential coefficient
+     */
     @Override
     public void setD(double kD) {
         if (this.m_kD != kD) {
@@ -113,15 +120,17 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * gets IZone value of slot 0
-     *
+     * gets IZone value of slot 0. The max distance from target where I term will be calculated
      * @return IZone value
      */
-
     public double getIzone() {
         return m_controller.getIZone();
     }
 
+    /**
+     * Set max distance from target where I term will be calculated
+     * @param kIz IZone value
+     */
     public void setIzone(double kIz) {
         if (this.m_kIz != kIz) {
             m_controller.setIZone(kIz);
@@ -130,14 +139,17 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * gets max I accumulator
-     *
+     * gets max I accumulator. Constrains I accumulator to prevent integral windup.
      * @return max I Accumulator
      */
     public double getIMaxAccum() {
         return m_controller.getIMaxAccum(0);
     }
 
+    /**
+     * Sets max I accumulator. Constrains I accumulator to prevent integral windup.
+     * @param kIMaxAccum max I Accumulator
+     */
     public void setIMaxAccum(double kIMaxAccum) {
         if (this.m_kIMaxAccum != kIMaxAccum) {
             m_controller.setIMaxAccum(kIMaxAccum, 0);
@@ -153,6 +165,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         return m_controller.getFF();
     }
 
+    /**
+     * Sets feed forward gain
+     * @param kF feed forward gain
+     */
     public void setF(double kF) {
         if (this.m_kF != kF) {
             m_controller.setFF(kF);
@@ -161,24 +177,40 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * gets Max Output
-     *
+     * gets max output
      * @return maximum output
      */
     public double getMaxOutput() {
         return m_controller.getOutputMax();
     }
 
+    /**
+     * gets min output
+     * @return minimum output
+     */
     public double getMinOutput() {
         return m_controller.getOutputMin();
     }
 
+    /**
+     * Set P, I and D constants
+     * @param p proportional coefficient
+     * @param i integral coefficient
+     * @param d derivative coefficient
+     */
     public void setPID(double p, double i,double d) {
         this.setP(p);
         this.setI(i);
         this.setD(d);
     }
 
+    /**
+     * Set P, I, D, and F constants
+     * @param p proportional coefficient
+     * @param i integral coefficient
+     * @param d derivative coefficient
+     * @param f feed forward coefficient
+     */
     public void setPIDF(double p, double i, double d, double f) {
         this.setP(p);
         this.setI(i);
@@ -186,6 +218,11 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.setF(f);
     }
 
+    /**
+     * Set min and max output of PID
+     * @param kMinOutput min output
+     * @param kMaxOutput max output
+     */
     public void setOutputRange(double kMinOutput, double kMaxOutput) {
         if ((this.m_kMinOutput != kMinOutput) || (this.m_kMaxOutput != kMaxOutput)) {
             m_controller.setOutputRange(kMinOutput, kMaxOutput);
@@ -195,38 +232,38 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     *
-     * @return the control type the PIDController is using (current, velocity, position)
+     * @return the control type the PIDController is using.
      */
     public ControlType getControlType() { return this.m_controlType; }
 
+    /**
+     * Set the control type of the PID
+     * @param controlType control type
+     */
     public void setControlType(ControlType controlType) {
         this.m_controlType = controlType;
     }
 
+    /**
+     * Run PID on this controller from setpoint
+     */
     @Override
     public void runPID() {
         m_controller.setReference(m_setpoint, m_controlType);
     }
 
+    /**
+     * Set setpoint and run PID on this controller
+     * @param target
+     */
     public void runPID(double target) {
         setSetpoint(target);
         runPID();
     }
 
-    public CANPIDController getController() {
-        return this.m_controller;
-    }
-
     /**
      * Set the controller reference value based on the selected control mode.
-     *
-     * @param setpoint The value to set depending on the control mode. For basic
-     * duty cycle control this should be a value between -1 and 1
-     * Otherwise: Voltage Control: Voltage (volts) Velocity Control: Velocity
-     * (RPM) Position Control: Position (Rotations) Current Control: Current
-     * (Amps). Native units can be changed using the setPositionConversionFactor()
-     * or setVelocityConversionFactor() methods of the CANEncoder class
+     * @param setpoint The value to set depending on the control mode.
      */
     @Override
     public void setSetpoint(double setpoint) {
@@ -234,8 +271,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * gets setpoint
-     *
+     * get setpoint
      * @return setpoint
      */
     public double getSetpoint() {
@@ -243,7 +279,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * resets I Accum to 0
+     * resets PID controller.
      */
     @Override
     public void reset() {
@@ -251,8 +287,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * sets encoder to a given position
-     *
+     * resets encoder to a given position
      * @param position desired position
      */
     @Override
@@ -310,7 +345,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     @Override
     public void initSendable(SendableBuilder builder) {
-//        builder.setSmartDashboardType("PIDController");
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
