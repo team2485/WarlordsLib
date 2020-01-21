@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "idea"
-    id "edu.wpi.first.GradleRIO" version "2019.4.1"
+    id "edu.wpi.first.GradleRIO"
     //Update me! Latest version of GradleRIO at https://plugins.gradle.org/plugin/edu.wpi.first.GradleRIO
 }
 
@@ -11,7 +11,7 @@ repositories {
     mavenCentral()
 }
 
-// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
+// Defining my dependencies. In this case, WPILib (+ friends), and base libraries.
 // Also defines JUnit 4.
 dependencies {
     compile wpi.deps.wpilib()
@@ -19,6 +19,8 @@ dependencies {
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     testCompile 'junit:junit:4.12'
+
 }
+
 
 
