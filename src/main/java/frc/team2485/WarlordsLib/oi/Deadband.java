@@ -71,7 +71,7 @@ public class Deadband {
      * @return cubically scaled input
      */
     public static double cubicScale(double value) {
-        return cubicScale(value, 0.0);
+        return cubicScale(value, 1.0);
     }
 
     /**
@@ -94,7 +94,7 @@ public class Deadband {
      * @return deadbanded and cubically scaled input
      */
     public static double cubicScaledDeadband(double value, double threshold) {
-        return cubicScaledDeadband(value, threshold, 0);
+        return cubicScaledDeadband(value, threshold, 1.0);
     }
 
 }
