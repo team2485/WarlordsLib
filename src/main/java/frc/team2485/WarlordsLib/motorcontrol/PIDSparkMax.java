@@ -19,7 +19,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double m_kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
+    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum;
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -38,24 +38,35 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_controller.setIAccum(0);
 
         this.m_kP = this.m_controller.getP();
-        this.kI = this.m_controller.getI();
-        this.kD = this.m_controller.getD();
-        this.kIz = this.m_controller.getIZone();
-        this.kF = this.m_controller.getFF();
-        this.kMaxOutput = this.m_controller.getOutputMax();
-        this.kMinOutput = this.m_controller.getOutputMin();
-        this.kIMaxAccum = this.m_controller.getIMaxAccum(0);
+        this.m_kI = this.m_controller.getI();
+        this.m_kD = this.m_controller.getD();
+        this.m_kIz = this.m_controller.getIZone();
+        this.m_kF = this.m_controller.getFF();
+        this.m_kMaxOutput = this.m_controller.getOutputMax();
+        this.m_kMinOutput = this.m_controller.getOutputMin();
+        this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
     }
 
     public void setFeedbackDevice(CANEncoder feedbackDevice) {
         this.m_encoder = feedbackDevice;
         m_controller.setFeedbackDevice(feedbackDevice);
     }
+
+    /**
+     * gets the proportional coefficient
+     *
+     * @return proportional coefficient
+     */
     @Override
     public double getP() {
         return m_controller.getP();
     }
 
+    /**
+     * sets proportional coefficient
+     *
+     * @param kP proportional coefficient
+     */
     @Override
     public void setP(double kP) {
         if (this.m_kP != kP) {
@@ -64,6 +75,11 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         }
     }
 
+    /**
+     * gets the Integral coefficient
+     *
+     * @return integral coefficient
+     */
     @Override
     public double getI() {
         return m_controller.getI();
@@ -72,12 +88,17 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     @Override
     public void setI(double kI) {
-        if (this.kI != kI) {
+        if (this.m_kI != kI) {
             m_controller.setI(kI);
-            this.kI = kI;
+            this.m_kI = kI;
         }
     }
 
+    /**
+     * gets the Differential coefficient
+     *
+     * @return differential coefficient
+     */
     @Override
     public double getD() {
         return m_controller.getD();
@@ -85,45 +106,65 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     @Override
     public void setD(double kD) {
-        if (this.kD != kD) {
+        if (this.m_kD != kD) {
             m_controller.setD(kD);
-            this.kD = kD;
+            this.m_kD = kD;
         }
     }
+
+    /**
+     * gets IZone value of slot 0
+     *
+     * @return IZone value
+     */
 
     public double getIzone() {
         return m_controller.getIZone();
     }
 
     public void setIzone(double kIz) {
-        if (this.kIz != kIz) {
+        if (this.m_kIz != kIz) {
             m_controller.setIZone(kIz);
-            this.kIz = kIz;
+            this.m_kIz = kIz;
         }
     }
 
+    /**
+     * gets max I accumulator
+     *
+     * @return max I Accumulator
+     */
     public double getIMaxAccum() {
         return m_controller.getIMaxAccum(0);
     }
 
     public void setIMaxAccum(double kIMaxAccum) {
-        if (this.kIMaxAccum != kIMaxAccum) {
+        if (this.m_kIMaxAccum != kIMaxAccum) {
             m_controller.setIMaxAccum(kIMaxAccum, 0);
-            this.kIMaxAccum = kIMaxAccum;
+            this.m_kIMaxAccum = kIMaxAccum;
         }
     }
 
+    /**
+     * gets feed forward gain
+     * @return Fees-forward Gain
+     */
     public double getF() {
         return m_controller.getFF();
     }
 
     public void setF(double kF) {
-        if (this.kF != kF) {
+        if (this.m_kF != kF) {
             m_controller.setFF(kF);
-            this.kF = kF;
+            this.m_kF = kF;
         }
     }
 
+    /**
+     * gets Max Output
+     *
+     * @return maximum output
+     */
     public double getMaxOutput() {
         return m_controller.getOutputMax();
     }
@@ -139,18 +180,17 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     public void setPIDF(double p, double i, double d, double f) {
-        if ((this.m_kP != m_kP) || (this.kI != kI) || (this.kD != kD) || (this.kF != kF)) {
-            m_controller.setP(p);
-            m_controller.setI(i);
-            m_controller.setD(d);
-        }
+        this.setP(p);
+        this.setI(i);
+        this.setD(d);
+        this.setF(f);
     }
 
     public void setOutputRange(double kMinOutput, double kMaxOutput) {
-        if ((this.kMinOutput != kMinOutput) || (this.kMaxOutput != kMaxOutput)) {
+        if ((this.m_kMinOutput != kMinOutput) || (this.m_kMaxOutput != kMaxOutput)) {
             m_controller.setOutputRange(kMinOutput, kMaxOutput);
-            this.kMinOutput = kMinOutput;
-            this.kMaxOutput = kMaxOutput;
+            this.m_kMinOutput = kMinOutput;
+            this.m_kMaxOutput = kMaxOutput;
         }
     }
 
@@ -158,9 +198,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      *
      * @return the control type the PIDController is using (current, velocity, position)
      */
-    public ControlType getControlType() {
-        return this.m_controlType;
-    }
+    public ControlType getControlType() { return this.m_controlType; }
 
     public void setControlType(ControlType controlType) {
         this.m_controlType = controlType;
@@ -195,20 +233,38 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_setpoint = setpoint;
     }
 
+    /**
+     * gets setpoint
+     *
+     * @return setpoint
+     */
     public double getSetpoint() {
         return this.m_setpoint;
     }
 
+    /**
+     * resets I Accum to 0
+     */
     @Override
     public void reset() {
         this.m_controller.setIAccum(0);
     }
 
+    /**
+     * sets encoder to a given position
+     *
+     * @param position desired position
+     */
     @Override
     public void setEncoderPosition(double position) {
         m_encoder.setPosition(position);
     }
 
+    /**
+     * get PID output based on control mode
+     * @param controlType control mode
+     * @return output
+     */
     public double getOutput(ControlType controlType) {
         switch (controlType) {
             case kCurrent:
@@ -264,6 +320,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
     }
+
 
     @Override
     public void loadConfigs(LoadableConfigs configs) {
