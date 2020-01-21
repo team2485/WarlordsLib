@@ -21,6 +21,7 @@ public class WL_SparkMax extends WPI_SparkMax {
         super(deviceID, type);
         this.restoreFactoryDefaults();
         this.clearFaults();
+        this.enableVoltageCompensation(12.0);
     }
 
     /**
