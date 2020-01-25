@@ -4,6 +4,9 @@ import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXPIDSetConfiguration;
 import com.revrobotics.ControlType;
+import frc.team2485.WarlordsLib.robotConfigs.Configurable;
+import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
+import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
 public class PIDTalonSRX extends WL_TalonSRX {
 
@@ -97,4 +100,6 @@ public class PIDTalonSRX extends WL_TalonSRX {
                 return 0;
         }
     }
+
+
 }
