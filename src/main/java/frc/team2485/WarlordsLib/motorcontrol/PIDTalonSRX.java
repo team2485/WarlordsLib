@@ -1,12 +1,8 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
-import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXPIDSetConfiguration;
-import com.revrobotics.ControlType;
-import frc.team2485.WarlordsLib.robotConfigs.Configurable;
-import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
-import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import frc.team2485.WarlordsLib.sensors.TalonSRXEncoder;
 
 public class PIDTalonSRX extends WL_TalonSRX {
 
@@ -84,6 +80,23 @@ public class PIDTalonSRX extends WL_TalonSRX {
 
     public void setOutputRange(double minOutput, double MaxOutput) {
 
+    }
+
+    public void configureFeedbackDevice(TalonSRXEncoder encoder) {
+        FeedbackDevice feedbackDevice = FeedbackDevice.None;
+        switch (encoder.getEncoderType()) {
+            case ABSOLUTE:
+                feedbackDevice = FeedbackDevice.PulseWidthEncodedPosition;
+                break;
+            case QUADRATURE:
+                feedbackDevice = FeedbackDevice.QuadEncoder;
+                break;
+            case ANALOG:
+                feedbackDevice = FeedbackDevice.Analog;
+                break;
+        }
+
+        this.configSelectedFeedbackSensor(feedbackDevice);
     }
 
     public double getOutput() {

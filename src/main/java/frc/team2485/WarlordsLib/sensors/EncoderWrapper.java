@@ -12,7 +12,7 @@ public interface EncoderWrapper {
      * Reset position of encoder
      * @param position position to set encoder
      */
-    void setPosition(double position);
+    void resetPosition(double position);
 
     /**
      * Set distance per revolution scale factor for encoder

@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import frc.team2485.WarlordsLib.sensors.TalonSRXEncoder;
 
 /**
  * Warlords wrapper for TalonSRX with convenience functions.
