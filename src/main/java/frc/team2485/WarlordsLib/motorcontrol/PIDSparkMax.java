@@ -50,7 +50,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * Set the PID's feedback device
      * @param feedbackDevice feedbackDevice
      */
-    public void setFeedbackDevice(CANEncoder feedbackDevice) {
+    public void configureFeedbackDevice(CANEncoder feedbackDevice) {
         this.m_encoder = feedbackDevice;
         m_controller.setFeedbackDevice(feedbackDevice);
     }
@@ -343,6 +343,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         }
     }
 
+    public CANPIDController getController() {
+        return m_controller;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("p", this::getP, this::setP);
@@ -364,6 +368,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.setF(configs.getDouble("f", this.getF()));
         this.setIzone(configs.getDouble("iZone", this.getIzone()));
         this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
+        this.setClosedLoopRampRate(configs.getDouble("rampRate", this.getClosedLoopRampRate()));
     }
 
     @Override
@@ -374,5 +379,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         configs.put("f", this.getF());
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
+        configs.put("rampRate", this.getClosedLoopRampRate());
     }
 }
