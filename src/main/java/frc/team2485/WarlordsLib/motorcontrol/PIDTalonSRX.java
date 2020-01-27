@@ -23,7 +23,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
+    private double kP, kI, kD, kIz, kF, kRR, kIMaxAccum;
 
     private int pidIdx = 0;
 
@@ -38,6 +38,17 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         super(deviceID);
 
         this.m_controlMode = controlMode;
+        this.kP = this.getTerms().kP;
+        this.kI = this.getTerms().kI;
+        this.kD = this.getTerms().kD;
+        this.kF = this.getTerms().kF;
+        this.kIz = this.getTerms().integralZone;
+        this.kIMaxAccum = this.getTerms().maxIntegralAccumulator;
+
+        TalonSRXConfiguration configs = new TalonSRXConfiguration();
+        this.baseGetAllConfigs(configs, 0);
+        this.kRR = configs.closedloopRamp;
+
 
     }
 
@@ -48,61 +59,107 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
     }
 
     public void setP(double kP) {
-        this.config_kP(pidIdx, kP);
+        if(this.kP != kP) {
+            this.config_kP(pidIdx, kP);
+            this.kP = kP;
+        }
     }
 
     public double getP() {
-        return this.getTerms().kP;
+        return this.kP;
     }
 
     public void setI(double kI) {
-        this.config_kP(pidIdx, kI);
+        if(this.kI != kI) {
+            this.config_kI(pidIdx, kI);
+            this.kI = kI;
+        }
     }
 
     public double getI() {
-        return this.getTerms().kI;
+        return this.kI;
     }
 
     public void setD(double kD) {
-        this.config_kD(pidIdx, kD);
+        if(this.kD != kD) {
+            this.config_kD(pidIdx, kD);
+            this.kD = kD;
+        }
     }
 
     public double getD() {
-        return this.getTerms().kD;
+        return this.kD;
     }
 
     public void setF(double kF) {
-        this.config_kF(pidIdx, kF);
+        if(this.kF != kF) {
+            this.config_kF(pidIdx, kF);
+            this.kF = kF;
+        }
     }
 
     public double getF() {
-        return this.getTerms().kF;
+        return this.kF;
+    }
+
+    /**
+     * Set P, I and D constants
+     * @param p proportional coefficient
+     * @param i integral coefficient
+     * @param d derivative coefficient
+     */
+    public void setPID(double p, double i,double d) {
+        this.setP(p);
+        this.setI(i);
+        this.setD(d);
+    }
+
+    /**
+     * Set P, I, D, and F constants
+     * @param p proportional coefficient
+     * @param i integral coefficient
+     * @param d derivative coefficient
+     * @param f feed forward coefficient
+     */
+    public void setPIDF(double p, double i, double d, double f) {
+        this.setP(p);
+        this.setI(i);
+        this.setD(d);
+        this.setF(f);
     }
 
     public void setIzone(double kIz) {
-        this.config_IntegralZone(pidIdx, (int) kIz);
+        if(this.kIz != kIz) {
+            this.config_IntegralZone(pidIdx, (int) kIz);
+            this.kIz = kIz;
+        }
     }
 
     public double getIzone() {
-        return this.getTerms().integralZone;
+        return this.kIz;
     }
 
     public void setIMaxAccum(double kIMaxAccum) {
-        this.configMaxIntegralAccumulator(pidIdx, kIMaxAccum);
+        if(this.kIMaxAccum != kIMaxAccum) {
+            this.configMaxIntegralAccumulator(pidIdx, kIMaxAccum);
+        }
+
     }
 
     public double getIMaxAccum() {
-        return this.getTerms().maxIntegralAccumulator;
+        return this.kIMaxAccum;
     }
 
     public void setClosedLoopRampRate(double seconds) {
-        this.configClosedloopRamp(seconds);
+        if (this.kRR != seconds) {
+            this.configClosedloopRamp(seconds);
+            this.kRR = seconds;
+        }
+
     }
 
     public double getClosedLoopRampRate() {
-        TalonSRXConfiguration configs = new TalonSRXConfiguration();
-        this.baseGetAllConfigs(configs, 0);
-        return configs.closedloopRamp;
+        return this.kRR;
     }
 
     public void setSetpoint(double setpoint) {

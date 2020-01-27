@@ -2,6 +2,7 @@ package frc.team2485.WarlordsLib.sensors;
 
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.Sendable;
 
 public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper {
 
