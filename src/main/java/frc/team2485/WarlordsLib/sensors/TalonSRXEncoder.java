@@ -44,9 +44,9 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
             case ABSOLUTE:
                 return this.getPulseWidthPosition() * m_distancePerRevolution / m_pulsesPerRevolution;
             case QUADRATURE:
-                return convertTicksToDistance(this.getQuadraturePosition());
+                return this.getQuadraturePosition() * m_distancePerRevolution / m_pulsesPerRevolution;
             case ANALOG:
-                return convertTicksToDistance(this.getAnalogInRaw());
+                return this.getAnalogInRaw() * m_distancePerRevolution / m_pulsesPerRevolution;
             default:
                 return 0;
         }
@@ -60,13 +60,13 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
     public void resetPosition(double position) {
         switch (m_encoderType) {
             case ABSOLUTE:
-                this.setPulseWidthPosition(convertDistanceToTicks(position),0);
+                this.setPulseWidthPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 0);
                 break;
             case QUADRATURE:
-                this.setQuadraturePosition(convertDistanceToTicks(position),0);
+                this.setQuadraturePosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution),0);
                 break;
             case ANALOG:
-                this.setAnalogPosition(convertDistanceToTicks(position), 0);
+                this.setAnalogPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 0);
                 break;
         }
     }
@@ -89,21 +89,13 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
     public double getVelocity() {
         switch (m_encoderType) {
             case ABSOLUTE:
-                return convertTicksToDistance(this.getPulseWidthVelocity())*10;
+                return (this.getPulseWidthVelocity() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             case QUADRATURE:
-                return convertTicksToDistance(this.getQuadratureVelocity())*10;
+                return (this.getQuadratureVelocity() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             case ANALOG:
-                return convertTicksToDistance(this.getAnalogInVel())*10;
+                return (this.getAnalogInVel() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             default:
                 return 0;
         }
-    }
-
-    private int convertDistanceToTicks(double distance) {
-        return (int) (distance * m_pulsesPerRevolution / m_distancePerRevolution);
-    }
-
-    private double convertTicksToDistance(int ticks) {
-        return ticks * m_distancePerRevolution / m_pulsesPerRevolution;
     }
 }
