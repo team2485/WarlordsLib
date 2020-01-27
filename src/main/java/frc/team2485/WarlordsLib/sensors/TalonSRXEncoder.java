@@ -1,9 +1,14 @@
 package frc.team2485.WarlordsLib.sensors;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Sendable;
 
+/**
+ * A wrapper for interfacing with an encoder plugged into a TalonSRX.
+ */
 public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper {
 
     public enum TalonSRXEncoderType {
@@ -24,14 +29,6 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
 
     public TalonSRXEncoder(int deviceId, TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
         this(new TalonSRX(deviceId), encoderType, pulsesPerRevolution);
-    }
-
-    public void setEncoderType(TalonSRXEncoderType encoderType) {
-        this.m_encoderType = encoderType;
-    }
-
-    public TalonSRXEncoderType getEncoderType() {
-        return this.m_encoderType;
     }
 
     /**
@@ -96,6 +93,12 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
                 return (this.getAnalogInVel() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             default:
                 return 0;
+        }
+    }
+
+    private void reportError(ErrorCode code) {
+        if (code != ErrorCode.OK) {
+            DriverStation.reportWarning("TalonSRX Encoder Wrapper Error: " + code.toString(), true);
         }
     }
 }

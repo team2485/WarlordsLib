@@ -66,4 +66,8 @@ public class WL_TalonSRX extends WPI_TalonSRX {
     public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit) {
         setCurrentLimiting(peakCurrentLimit, peakCurrentDuration, continuousCurrentLimit, true);
     }
+
+    public TalonSRXEncoder getEncoder(TalonSRXEncoder.TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
+        return new TalonSRXEncoder(this, encoderType, pulsesPerRevolution);
+    }
 }

@@ -17,7 +17,7 @@ import frc.team2485.WarlordsLib.sensors.TalonSRXEncoder;
 import static frc.team2485.WarlordsLib.sensors.TalonSRXEncoder.TalonSRXEncoderType.*;
 
 
-public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorController {
+public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorController<ControlMode, FeedbackDevice> {
 
     private ControlMode m_controlMode;
 
@@ -58,6 +58,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         return terms;
     }
 
+    @Override
     public void setP(double kP) {
         if(this.kP != kP) {
             this.config_kP(pidIdx, kP);
@@ -65,10 +66,12 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    @Override
     public double getP() {
         return this.kP;
     }
 
+    @Override
     public void setI(double kI) {
         if(this.kI != kI) {
             this.config_kI(pidIdx, kI);
@@ -76,10 +79,12 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    @Override
     public double getI() {
         return this.kI;
     }
 
+    @Override
     public void setD(double kD) {
         if(this.kD != kD) {
             this.config_kD(pidIdx, kD);
@@ -87,6 +92,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    @Override
     public double getD() {
         return this.kD;
     }
@@ -162,10 +168,12 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         return this.kRR;
     }
 
+    @Override
     public void setSetpoint(double setpoint) {
         this.m_setpoint = setpoint;
     }
 
+    @Override
     public double getSetpoint() {
         return this.m_setpoint;
     }
@@ -178,46 +186,32 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         this.set(m_controlMode, m_setpoint);
     }
 
+    @Override
     public void runPID(double target) {
         this.setSetpoint(target);
         this.runPID();
     }
 
+    @Override
     public ControlMode getControlMode() {
         return this.m_controlMode;
     }
 
+    @Override
     public void setControlMode(ControlMode controlMode) {
         this.m_controlMode = controlMode;
     }
 
-
-    public void configureFeedbackDevice(TalonSRXEncoder encoder) {
-        this.m_encoder = encoder;
-        FeedbackDevice feedbackDevice = FeedbackDevice.None;
-        switch (encoder.getEncoderType()) {
-            case ABSOLUTE:
-                feedbackDevice = FeedbackDevice.PulseWidthEncodedPosition;
-                break;
-            case QUADRATURE:
-                feedbackDevice = FeedbackDevice.QuadEncoder;
-                break;
-            case ANALOG:
-                feedbackDevice = FeedbackDevice.Analog;
-                break;
-        }
-
+    @Override
+    public void setFeedbackDeviceType(FeedbackDevice feedbackDevice) {
         this.configSelectedFeedbackSensor(feedbackDevice);
     }
     /**
      * resets PID controller.
-     * cannot find set I accumulator method so sets max to zero and then back
      */
     @Override
     public void reset() {
-        double maxAccum = this.getIMaxAccum();
-        this.setIMaxAccum(0);
-        this.setIMaxAccum(maxAccum);
+        this.setIntegralAccumulator(0);
     }
 
     /**

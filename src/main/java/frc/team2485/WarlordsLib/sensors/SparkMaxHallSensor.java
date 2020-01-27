@@ -1,19 +1,20 @@
 package frc.team2485.WarlordsLib.sensors;
 
-import com.revrobotics.*;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANError;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.EncoderType;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/**
- * Used to interface with an alternate quadrature encoder plugged into a SparkMax. Not to be used with the Hall Sensor.
- */
-public class SparkMaxAlternateEncoder extends CANEncoder implements EncoderWrapper {
+public class SparkMaxHallSensor extends CANEncoder implements EncoderWrapper {
 
-    public SparkMaxAlternateEncoder(CANSparkMax spark, int pulsesPerRevolution) {
-        super(spark, AlternateEncoderType.kQuadrature, pulsesPerRevolution);
-    }
-
-    public SparkMaxAlternateEncoder(int deviceId, int pulsesPerRevolution) {
-        this(new CANSparkMax(deviceId, CANSparkMaxLowLevel.MotorType.kBrushless), pulsesPerRevolution);
+    /**
+     * Constructs a Hall Effect CANEncoder.
+     *
+     * @param device   The Spark Max to which the encoder is attached.
+     */
+    public SparkMaxHallSensor(CANSparkMax device) {
+        super(device);
     }
 
     /**
@@ -43,6 +44,7 @@ public class SparkMaxAlternateEncoder extends CANEncoder implements EncoderWrapp
     public double getVelocity() {
         return super.getVelocity() / 60; // from distance per minute to distance per second
     }
+
 
     private void handleCANError(CANError error) {
         if (error != CANError.kOk) {
