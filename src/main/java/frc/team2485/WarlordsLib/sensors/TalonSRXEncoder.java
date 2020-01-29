@@ -77,6 +77,9 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
         this.m_distancePerRevolution = distance;
     }
 
+    public double getDistancePerRevolution() {
+        return this.m_distancePerRevolution;
+    }
     /**
      * Get velocity in distance per second.
      *
