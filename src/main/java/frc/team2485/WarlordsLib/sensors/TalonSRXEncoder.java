@@ -5,11 +5,14 @@ import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Sendable;
+import frc.team2485.WarlordsLib.robotConfigs.Configurable;
+import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
+import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
 /**
  * A wrapper for interfacing with an encoder plugged into a TalonSRX.
  */
-public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper {
+public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper, Configurable {
 
     public enum TalonSRXEncoderType {
         ABSOLUTE, QUADRATURE, ANALOG
@@ -17,9 +20,11 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
 
     private double m_distancePerRevolution = 1;
 
-    private double m_pulsesPerRevolution;
+    private int m_pulsesPerRevolution;
 
     private TalonSRXEncoderType m_encoderType;
+
+    private double m_offset = 0;
 
     public TalonSRXEncoder(TalonSRX motorController, TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
         super(motorController);
@@ -39,7 +44,7 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
     public double getPosition() {
         switch (m_encoderType) {
             case ABSOLUTE:
-                return this.getPulseWidthPosition() * m_distancePerRevolution / m_pulsesPerRevolution;
+                return m_offset = this.getPulseWidthPosition() * m_distancePerRevolution / m_pulsesPerRevolution;
             case QUADRATURE:
                 return this.getQuadraturePosition() * m_distancePerRevolution / m_pulsesPerRevolution;
             case ANALOG:
@@ -57,13 +62,14 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
     public void resetPosition(double position) {
         switch (m_encoderType) {
             case ABSOLUTE:
-                this.setPulseWidthPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 0);
+                reportError(this.setPulseWidthPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
+                this.m_offset = position - this.getPulseWidthPosition();
                 break;
             case QUADRATURE:
-                this.setQuadraturePosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution),0);
+                reportError(this.setQuadraturePosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution),50));
                 break;
             case ANALOG:
-                this.setAnalogPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 0);
+                reportError(this.setAnalogPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
                 break;
         }
     }
@@ -80,6 +86,15 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
     public double getDistancePerRevolution() {
         return this.m_distancePerRevolution;
     }
+
+    public void setPulsesPerRevolution(int pulsesPerRevolution) {
+        this.m_pulsesPerRevolution = pulsesPerRevolution;
+    }
+
+    public int getPulsesPerRevolution() {
+        return this.m_pulsesPerRevolution;
+    }
+
     /**
      * Get velocity in distance per second.
      *
@@ -103,5 +118,26 @@ public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper 
         if (code != ErrorCode.OK) {
             DriverStation.reportWarning("TalonSRX Encoder Wrapper Error: " + code.toString(), true);
         }
+    }
+
+
+    /**
+     * Loads configs from RobotConfigs
+     *
+     * @param configs ConfigsWrapper abstraction that exposes only load methods
+     */
+    @Override
+    public void loadConfigs(LoadableConfigs configs) {
+        this.m_offset = configs.getDouble("offset", this.m_offset);
+    }
+
+    /**
+     * Saves configs to RobotConfigs
+     *
+     * @param configs ConfigsWrapper abstraction that exposes only put methods
+     */
+    @Override
+    public void saveConfigs(SavableConfigs configs) {
+        configs.put("offset", this.m_offset);
     }
 }
