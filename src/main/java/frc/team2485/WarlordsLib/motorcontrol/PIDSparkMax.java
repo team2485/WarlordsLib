@@ -323,7 +323,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return output of pid
      */
     @Override
-    public double getOutput()  {
+    public double getSensorOutput()  {
         switch (m_controlType) {
             case kCurrent:
                 return this.getOutputCurrent();

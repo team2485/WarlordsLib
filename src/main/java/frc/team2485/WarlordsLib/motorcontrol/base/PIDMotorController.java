@@ -64,7 +64,7 @@ public interface PIDMotorController<ControlMode, FeedbackEnum> {
      * Get output of PID based on mode
      * @return pid output
      */
-    double getOutput();
+    double getSensorOutput();
 
     /**
      * Reset integrators and pid here.
