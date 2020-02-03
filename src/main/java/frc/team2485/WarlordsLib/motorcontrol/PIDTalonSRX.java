@@ -2,19 +2,15 @@ package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.SensorCollection;
-import com.ctre.phoenix.motorcontrol.can.BaseMotorControllerConfiguration;
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
-import frc.team2485.WarlordsLib.sensors.TalonSRXEncoder;
-
-import static frc.team2485.WarlordsLib.sensors.TalonSRXEncoder.TalonSRXEncoderType.*;
 
 
 public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorController<ControlMode, FeedbackDevice> {
@@ -27,7 +23,11 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     private int pidIdx = 0;
 
-    private TalonSRXEncoder m_encoder;
+    private double m_conversionFactor = 1;
+
+    private double m_threshold;
+
+    private double m_encoderOffset;
 
     /**
      * Constructor for TalonSRX object
@@ -52,7 +52,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     }
 
-    public SlotConfiguration getTerms() {
+    private SlotConfiguration getTerms() {
         SlotConfiguration terms = new SlotConfiguration();
         this.getSlotConfigs(terms);
         return terms;
@@ -164,18 +164,31 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     }
 
+    /**
+     * Controller will multiply the setpoint by this number.
+     * @param setpointConversionFactor conversion factor
+     */
+    public void setConversionFactor(double setpointConversionFactor) {
+        this.m_conversionFactor = setpointConversionFactor;
+    }
+
+    public double getConversionFactor() {
+        return this.m_conversionFactor;
+
+    }
+
     public double getClosedLoopRampRate() {
         return this.kRR;
     }
 
     @Override
     public void setSetpoint(double setpoint) {
-        this.m_setpoint = setpoint;
+        this.m_setpoint = (setpoint - m_encoderOffset )/ m_conversionFactor ;
     }
 
     @Override
     public double getSetpoint() {
-        return this.m_setpoint;
+        return this.m_setpoint * m_conversionFactor + m_encoderOffset;
     }
 
     /**
@@ -192,20 +205,33 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         this.runPID();
     }
 
+    /**
+     * Get the control mode of this pid
+     * @return control mode of this pid
+     */
     @Override
     public ControlMode getControlMode() {
         return this.m_controlMode;
     }
 
+    /**
+     * Set the control mode of this pid
+     * @param controlMode control mode of the pid
+     */
     @Override
     public void setControlMode(ControlMode controlMode) {
         this.m_controlMode = controlMode;
     }
 
+    /**
+     * Set the feedback device type for the pid
+     * @param feedbackDevice type of sensor
+     */
     @Override
     public void setFeedbackDeviceType(FeedbackDevice feedbackDevice) {
         this.configSelectedFeedbackSensor(feedbackDevice);
     }
+
     /**
      * resets PID controller.
      */
@@ -215,21 +241,78 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
     }
 
     /**
-     * resets encoder to a given position in radians
+     * Resets encoder to a given position in radians.
      * @param position desired position
      */
     public void setEncoderPosition(double position) {
-        m_encoder.resetPosition(position);
+        this.setSelectedSensorPosition(this.getSensorCollection().getPulseWidthPosition());
+        this.m_encoderOffset = position - (this.getSelectedSensorPosition() * m_conversionFactor);
     }
 
-    public double getOutput() {
+    /**
+     * Get selected encoder position adjusted for conversion factor and offset
+     * @return encoder position
+     */
+    public double getEncoderPosition() {
+        return (this.getSelectedSensorPosition() * m_conversionFactor) + m_encoderOffset;
+    }
+
+    /**
+     * Get selected sensor velocity adjusted for conversion factor
+     * @return connected encoder velocity
+     */
+    public double getEncoderVelocity() {
+        return this.getSelectedSensorVelocity() * m_conversionFactor;
+    }
+
+    /**
+     * Set threshold for atTarget()
+     * @param tolerance  pid is at target if within sensor output +/- this value
+     */
+    public void setTolerance(double tolerance) {
+        this.m_threshold = Math.abs(tolerance);
+    }
+
+    /**
+     * Get threshold for controller
+     * @return threshold
+     */
+    public double getThreshold(){
+        return this.m_threshold;
+    }
+
+    /**
+     * Returns true if sensor output is within a given threshold
+     * @return true when sensor is within threshold
+     */
+    public boolean atTarget() {
+        return atTarget(this.m_threshold);
+    }
+
+    /**
+     * Returns true if sensor output is within a given threshold
+     * @param threshold pid is at target if within sensor output +/- this value
+     * @return true when sensor is within threshold
+     */
+    public boolean atTarget(double threshold) {
+        return Math.abs(this.getSensorOutput() - this.getSetpoint()) < threshold;
+    }
+
+    /**
+     * Get sensor output based on control mode
+     * @return  Current: supply current;
+     *          Velocity: encoder velocity;
+     *          Position: encoder position;
+     *          Percent output: motor output percent;
+     */
+    public double getSensorOutput() {
         switch (m_controlMode) {
             case Current:
                 return this.getSupplyCurrent();
             case Velocity:
-                return this.getSelectedSensorVelocity();
+                return this.getEncoderVelocity();
             case Position:
-                return this.getSelectedSensorPosition();
+                return this.getEncoderPosition();
             case PercentOutput:
                 return this.getMotorOutputPercent();
             default:
@@ -239,6 +322,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     @Override
     public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("PIDController");
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
@@ -259,6 +343,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         this.setIzone(configs.getDouble("iZone", this.getIzone()));
         this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
         this.setClosedLoopRampRate((configs.getDouble("rampRate", this.getClosedLoopRampRate())));
+        this.m_encoderOffset = configs.getDouble("encoder offset", this.m_encoderOffset);
     }
 
     @Override
@@ -270,6 +355,6 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
         configs.put("rampRate", this.getClosedLoopRampRate());
+        configs.put("encoder offset", this.m_encoderOffset);
     }
-
 }

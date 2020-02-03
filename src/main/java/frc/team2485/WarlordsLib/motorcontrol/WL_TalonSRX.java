@@ -48,15 +48,6 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         this.enableCurrentLimit(currentLimitsEnabled);
     }
 
-    public void enableVoltageCompensation(double voltage) {
-        this.configVoltageCompSaturation(voltage);
-        this.enableVoltageCompensation(true);
-    }
-
-    public void enableVoltageCompensation() {
-        this.enableVoltageCompensation(12.0);
-    }
-
     /**
      * Config all current limits
      * @param peakCurrentLimit Peak current limit
@@ -65,6 +56,15 @@ public class WL_TalonSRX extends WPI_TalonSRX {
     s */
     public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit) {
         setCurrentLimiting(peakCurrentLimit, peakCurrentDuration, continuousCurrentLimit, true);
+    }
+
+    public void enableVoltageCompensation(double voltage) {
+        this.configVoltageCompSaturation(voltage);
+        this.enableVoltageCompensation(true);
+    }
+
+    public void enableVoltageCompensation() {
+        this.enableVoltageCompensation(12.0);
     }
 
     public TalonSRXEncoder getEncoder(TalonSRXEncoder.TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
