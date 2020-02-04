@@ -69,7 +69,7 @@ public interface PIDMotorController<ControlMode, FeedbackEnum> {
     /**
      * Reset integrators and pid here.
      */
-    void reset();
+    void resetPID();
 
     /**
      * Reset encoder position here

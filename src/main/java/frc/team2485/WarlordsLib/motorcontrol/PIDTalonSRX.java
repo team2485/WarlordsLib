@@ -183,7 +183,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     @Override
     public void setSetpoint(double setpoint) {
-        this.m_setpoint = (setpoint - m_encoderOffset )/ m_conversionFactor ;
+        this.m_setpoint = (setpoint - m_encoderOffset ) / m_conversionFactor ;
     }
 
     @Override
@@ -236,8 +236,9 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
      * resets PID controller.
      */
     @Override
-    public void reset() {
+    public void resetPID() {
         this.setIntegralAccumulator(0);
+        this.set(0);
     }
 
     /**

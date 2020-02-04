@@ -281,7 +281,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * resets PID controller.
      */
     @Override
-    public void reset() {
+    public void resetPID() {
         this.m_controller.setIAccum(0);
     }
 

@@ -146,7 +146,7 @@ public class Limelight {
         return m_limelightTable.getEntry("camtran").getDoubleArray(new double[6]);
     }
 
-    private enum LedMode {
+    public enum LedMode {
         DEFAULT(0), OFF(1), BLINK(2), ON(3);
 
         private int id;
