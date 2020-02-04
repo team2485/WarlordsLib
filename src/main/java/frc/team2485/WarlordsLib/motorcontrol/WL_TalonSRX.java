@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import frc.team2485.WarlordsLib.sensors.TalonSRXEncoder;
 
 /**
  * Warlords wrapper for TalonSRX with convenience functions.
@@ -47,6 +48,16 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         this.enableCurrentLimit(currentLimitsEnabled);
     }
 
+    /**
+     * Config all current limits
+     * @param peakCurrentLimit Peak current limit
+     * @param peakCurrentDuration Peak current limit duration (milliseconds)
+     * @param continuousCurrentLimit Continuous current limit
+    s */
+    public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit) {
+        setCurrentLimiting(peakCurrentLimit, peakCurrentDuration, continuousCurrentLimit, true);
+    }
+
     public void enableVoltageCompensation(double voltage) {
         this.configVoltageCompSaturation(voltage);
         this.enableVoltageCompensation(true);
@@ -56,13 +67,7 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         this.enableVoltageCompensation(12.0);
     }
 
-    /**
-     * Config all current limits
-     * @param peakCurrentLimit Peak current limit
-     * @param peakCurrentDuration Peak current limit duration (milliseconds)
-     * @param continuousCurrentLimit Continuous current limit
-    s */
-    public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit) {
-        setCurrentLimiting(peakCurrentLimit, peakCurrentDuration, continuousCurrentLimit, true);
+    public TalonSRXEncoder getEncoder(TalonSRXEncoder.TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
+        return new TalonSRXEncoder(this, encoderType, pulsesPerRevolution);
     }
 }

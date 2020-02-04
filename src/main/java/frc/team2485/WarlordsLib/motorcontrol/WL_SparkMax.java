@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.revrobotics.CANSparkMax;
 import frc.team2485.WarlordsLib.motorcontrol.base.WPI_SparkMax;
+import frc.team2485.WarlordsLib.sensors.SparkMaxAlternateEncoder;
 
 /**
  * Warlords wrapper for Spark Max with convenience functions.
@@ -21,7 +22,6 @@ public class WL_SparkMax extends WPI_SparkMax {
         super(deviceID, type);
         this.restoreFactoryDefaults();
         this.clearFaults();
-        this.enableVoltageCompensation(12.0);
     }
 
     /**
@@ -43,5 +43,9 @@ public class WL_SparkMax extends WPI_SparkMax {
         for (CANSparkMax m : slaves) {
             m.follow(this);
         }
+    }
+
+    public SparkMaxAlternateEncoder getAlternateEncoder(int pulsesPerRevolution) {
+        return new SparkMaxAlternateEncoder(this, pulsesPerRevolution);
     }
 }

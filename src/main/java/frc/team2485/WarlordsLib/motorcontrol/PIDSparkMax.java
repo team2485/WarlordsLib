@@ -3,13 +3,14 @@ package frc.team2485.WarlordsLib.motorcontrol;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
+import com.revrobotics.EncoderType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
-public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController {
+public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController<ControlType, EncoderType> {
 
     private ControlType m_controlType;
 
@@ -48,11 +49,21 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     /**
      * Set the PID's feedback device
-     * @param feedbackDevice feedbackDevice
+     * @param feedbackDeviceType feedbackDevice
      */
-    public void setFeedbackDevice(CANEncoder feedbackDevice) {
-        this.m_encoder = feedbackDevice;
-        m_controller.setFeedbackDevice(feedbackDevice);
+    @Override
+    public void setFeedbackDeviceType(EncoderType feedbackDeviceType) {
+        m_controller.setFeedbackDevice(new CANEncoder(this, feedbackDeviceType, 0)); // the counts per rev is not used
+    }
+
+    @Override
+    public ControlType getControlMode() {
+        return this.m_controlType;
+    }
+
+    @Override
+    public void setControlMode(ControlType controlType) {
+        this.m_controlType = controlType;
     }
 
     /**
@@ -232,19 +243,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * @return the control type the PIDController is using.
-     */
-    public ControlType getControlType() { return this.m_controlType; }
-
-    /**
-     * Set the control type of the PID
-     * @param controlType control type
-     */
-    public void setControlType(ControlType controlType) {
-        this.m_controlType = controlType;
-    }
-
-    /**
      * Run PID on this controller from setpoint
      */
     @Override
@@ -256,6 +254,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * Set setpoint and run PID on this controller
      * @param target
      */
+    @Override
     public void runPID(double target) {
         setSetpoint(target);
         runPID();
@@ -282,7 +281,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * resets PID controller.
      */
     @Override
-    public void reset() {
+    public void resetPID() {
         this.m_controller.setIAccum(0);
     }
 
@@ -324,7 +323,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return output of pid
      */
     @Override
-    public double getOutput()  {
+    public double getSensorOutput()  {
         switch (m_controlType) {
             case kCurrent:
                 return this.getOutputCurrent();
@@ -341,6 +340,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
             default:
                 return 0;
         }
+    }
+
+    public CANPIDController getController() {
+        return m_controller;
     }
 
     @Override
@@ -364,6 +367,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.setF(configs.getDouble("f", this.getF()));
         this.setIzone(configs.getDouble("iZone", this.getIzone()));
         this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
+        this.setClosedLoopRampRate(configs.getDouble("rampRate", this.getClosedLoopRampRate()));
     }
 
     @Override
@@ -374,5 +378,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         configs.put("f", this.getF());
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
+        configs.put("rampRate", this.getClosedLoopRampRate());
     }
 }

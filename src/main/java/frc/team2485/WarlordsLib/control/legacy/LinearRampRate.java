@@ -33,7 +33,7 @@ public class LinearRampRate implements ControlElement {
         if ((lastValue > 0 && input < 0) || (lastValue < 0 && input > 0)) {
             input = 0; // makes sure desired and lastValue have the same sign to make math easy
         }
-        //System.out.println("Desired: " + desired);
+
         double errorToDesired = Math.abs(input - lastValue);
 
         if (errorToDesired > maxErrorToDesired) {
