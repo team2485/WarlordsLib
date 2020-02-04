@@ -58,6 +58,10 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         return terms;
     }
 
+    /**
+     * Set Proportional constant
+     * @param kP proportional constant
+     */
     @Override
     public void setP(double kP) {
         if(this.kP != kP) {
@@ -66,11 +70,19 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    /**
+     * Set proportional constant
+     * @return proportional constant
+     */
     @Override
     public double getP() {
         return this.kP;
     }
 
+    /**
+     * Get integral constant
+     * @param kI integral constant
+     */
     @Override
     public void setI(double kI) {
         if(this.kI != kI) {
@@ -79,11 +91,19 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    /**
+     * Get integral constant
+     * @return integral constant
+     */
     @Override
     public double getI() {
         return this.kI;
     }
 
+    /**
+     * Set derivative constant
+     * @param kD derivative constant
+     */
     @Override
     public void setD(double kD) {
         if(this.kD != kD) {
@@ -92,11 +112,19 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    /**
+     * Get derivative constant
+     * @return derivative constant
+     */
     @Override
     public double getD() {
         return this.kD;
     }
 
+    /**
+     * Set feed forward constant
+     * @param kF feed forward constant
+     */
     public void setF(double kF) {
         if(this.kF != kF) {
             this.config_kF(pidIdx, kF);
@@ -104,6 +132,10 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         }
     }
 
+    /**
+     * Get feed forward constant
+     * @return feed forward constant
+     */
     public double getF() {
         return this.kF;
     }
