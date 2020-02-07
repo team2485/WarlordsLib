@@ -200,7 +200,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
      * Controller will multiply the setpoint by this number.
      * @param setpointConversionFactor conversion factor
      */
-    public void setConversionFactor(double setpointConversionFactor) {
+    public void setDistancePerPulse(double setpointConversionFactor) {
         this.m_conversionFactor = setpointConversionFactor;
     }
 

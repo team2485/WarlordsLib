@@ -2,6 +2,7 @@ package frc.team2485.WarlordsLib;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Limelight {
 
@@ -162,6 +163,10 @@ public class Limelight {
      */
     public void setLedMode(LedMode mode) {
         setNumberProperty("ledMode", mode.id);
+    }
+
+    public void toggleLed() {
+        setLedMode(getDoubleProperty("ledMode", 0) == LedMode.ON.id ? LedMode.OFF : LedMode.ON);
     }
 
     /**
