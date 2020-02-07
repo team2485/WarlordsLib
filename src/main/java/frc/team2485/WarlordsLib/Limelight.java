@@ -4,6 +4,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * A simple API that wraps the NetworkTables calls for the Limelight and handles some Limelight processing.
+ */
 public class Limelight {
 
     private NetworkTableInstance m_networkTableInstance;
