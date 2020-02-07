@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * RIGHT SIDE IS INVERTED!
  *
  */
+@Deprecated (since="0.2", forRemoval=true)
 public class WL_DifferentialDrive extends DifferentialDrive {
 
     /**
