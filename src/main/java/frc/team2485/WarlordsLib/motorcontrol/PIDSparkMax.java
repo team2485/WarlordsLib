@@ -20,7 +20,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum;
+    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, kFilt, filteredInput;
+
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -45,6 +46,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_kMaxOutput = this.m_controller.getOutputMax();
         this.m_kMinOutput = this.m_controller.getOutputMin();
         this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
+
+        this.kFilt = 0;
+        this.filteredInput = 0;
     }
 
     /**
@@ -299,10 +303,20 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @param controlType control mode
      * @return output
      */
+    public double getkFilter() {
+        return this.kFilt;
+    }
+    public void setkFilter(double kFilt) {
+        this.kFilt = kFilt;
+    }
+    public double getFilteredOutputCurrent() {
+        filteredInput += (this.getOutputCurrent() - filteredInput) *kFilt;
+        return filteredInput;
+    }
     public double getOutput(ControlType controlType) {
         switch (controlType) {
             case kCurrent:
-                return this.getOutputCurrent();
+                return this.getFilteredOutputCurrent();
             case kSmartVelocity:
             case kVelocity:
                 return m_encoder.getVelocity();
@@ -326,7 +340,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     public double getSensorOutput()  {
         switch (m_controlType) {
             case kCurrent:
-                return this.getOutputCurrent();
+                return this.getFilteredOutputCurrent();
             case kSmartVelocity:
             case kVelocity:
                 return m_encoder.getVelocity();
@@ -356,6 +370,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
         builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.addDoubleProperty("output", this::getSensorOutput, null);
+        builder.addDoubleProperty("kFilter", this::getkFilter,this::setkFilter);
+        builder.addDoubleProperty("rpm", m_encoder::getVelocity, null);
     }
 
 
