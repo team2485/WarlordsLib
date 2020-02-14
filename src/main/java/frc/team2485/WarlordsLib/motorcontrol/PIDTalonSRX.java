@@ -355,6 +355,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     @Override
     public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
         builder.setSmartDashboardType("PIDController");
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
