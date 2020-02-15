@@ -6,32 +6,59 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import java.util.ArrayList;
 
 public class CurrentManager implements Sendable {
-    private double m_maxBatteryCurrent, m_totalCurrentDraw, m_prioritizedTotal, m_deprioritizedTotal;
+
+    private static volatile CurrentManager m_instance;
+
+    private double m_maxBatteryCurrent;
+
+    private double DEFAULT_MAX_BATTERY_CURRENT = 120;
+
+    private double m_totalCurrentDraw, m_prioritizedTotal, m_deprioritizedTotal;
+
     private int m_prioritizedCount, m_deprioritizedCount;
+
     private ArrayList<PrioritizedManageable> m_manageables;
 
-    public CurrentManager(double maxBatteryCurrent) {
-        m_maxBatteryCurrent = maxBatteryCurrent;
-        m_manageables = new ArrayList<PrioritizedManageable>();
+    private boolean m_enabled;
+
+    public static CurrentManager getInstance() {
+        if (m_instance == null) {
+            synchronized (CurrentManager.class) {
+                if (m_instance == null) {
+                    m_instance = new CurrentManager();
+                }
+            }
+        }
+        return m_instance;
     }
 
-    public void add(Manageable m, boolean priority) {
+    private CurrentManager() {
+        m_maxBatteryCurrent = DEFAULT_MAX_BATTERY_CURRENT;
+        m_manageables = new ArrayList<PrioritizedManageable>();
+        m_enabled = true;
+    }
+
+    public void configMaxBatteryCurrent(double maxBatteryCurrent) {
+        this.m_maxBatteryCurrent = maxBatteryCurrent;
+    }
+
+    public void add(Manageable m, boolean priority, double absoluteMaxCurrent) {
         if(priority) {
-            m_manageables.add(0, new PrioritizedManageable(m, priority));
             m_prioritizedCount++;
         } else {
-            m_manageables.add(new PrioritizedManageable(m, priority));
             m_deprioritizedCount++;
         }
+
+        m_manageables.add(new PrioritizedManageable(m, priority, absoluteMaxCurrent));
 //       perhaps later weight code
 //        for (int i = 0; i <= m_manageables.size(); i++) {
 //            if(i == m_manageables.size()){
-//                m_manageables.add(new WeightedManageable(m, weight));
+//                m_manageables.add(new WeightedManageable(m_manageable, weight));
 //                break;
 //            }
 //
 //            if(m_manageables.get(i).getWeight() < weight) {
-//                m_manageables.add(i, new WeightedManageable(m, weight));
+//                m_manageables.add(i, new WeightedManageable(m_manageable, weight));
 //                break;
 //            }
 //        }
@@ -40,49 +67,56 @@ public class CurrentManager implements Sendable {
     /**
      * Updates the current manager and the maximum currents of all manageables (if needed).
      */
-    public void update() {
+    private void updateTotalCurrentDraw() {
         m_totalCurrentDraw = 0;
         m_prioritizedTotal = 0;
         for (PrioritizedManageable m : m_manageables) { //find total current draw
             double current = m.getManageable().getOutputCurrent();
-            if (m.getPriority()) {
+            if (m.isPriority()) {
                 m_prioritizedTotal += current;
             }
             m_totalCurrentDraw += current;
         }
-
         m_deprioritizedTotal = m_totalCurrentDraw - m_prioritizedTotal;
     }
 
-    public void regulate() {
+    private void regulateCurrent() {
         if (m_totalCurrentDraw > m_maxBatteryCurrent) { //if we are drawing too much
-            double deprioritizedCut; //fraction of deprioritized current that will remain
+            double deprioritizedProportion; //fraction of deprioritized current that will remain
+            double prioritizedProportion;
 
             if (m_totalCurrentDraw - m_maxBatteryCurrent >= m_prioritizedTotal) { //cutting DP will suffice
                 double remainingCurrent = m_maxBatteryCurrent - m_prioritizedTotal; //current remaining after prioritized motors
-
-                deprioritizedCut = remainingCurrent / m_deprioritizedTotal; //fraction of deprioritized current that will remain
-
+                deprioritizedProportion = remainingCurrent / m_deprioritizedTotal; //fraction of deprioritized current that will remain
+                prioritizedProportion = 1;
             } else { //cutting DP is not enough
-                deprioritizedCut = 0; //cut all deprioritized current
-                double prioritizedCut = m_maxBatteryCurrent / m_prioritizedTotal; //fraction of prioritized current that will remain
-
-                for (int i = m_deprioritizedCount; i < m_manageables.size(); i++) {
-                    Manageable m = m_manageables.get(i).getManageable();
-                    m.setAdjustedMaxCurrent(m.getOutputCurrent() * prioritizedCut);
-                }
+                deprioritizedProportion = 0; //cut all deprioritized current
+                prioritizedProportion = (m_maxBatteryCurrent - m_deprioritizedTotal) / m_prioritizedTotal; //fraction of prioritized current that will remain
             }
+
             //will always cut deprioritized
-            for(int i = 0; i < m_deprioritizedCount; i++) {
-                Manageable m = m_manageables.get(i).getManageable();
-                m.setAdjustedMaxCurrent(m.getOutputCurrent() * deprioritizedCut);
+            for(PrioritizedManageable m : m_manageables) {
+                if(m.isPriority()) {
+                    m.getManageable().setAdjustedMaxCurrent(m.getManageable().getOutputCurrent() * prioritizedProportion);
+                } else {
+                    m.getManageable().setAdjustedMaxCurrent(m.getManageable().getOutputCurrent() * deprioritizedProportion);
+                }
             }
         }
     }
 
     public void run() {
-        update();
-        regulate();
+        updateTotalCurrentDraw();
+        regulateCurrent();
+    }
+
+    public void setEnabled(boolean enabled) {
+        m_enabled = enabled;
+        if (!enabled) {
+            for(PrioritizedManageable m : m_manageables) {
+                m.getManageable().setAdjustedMaxCurrent(m.getAbsoluteMaxCurrent());
+            }
+        }
     }
 
     public double getMaxBatteryCurrent() {
@@ -110,19 +144,29 @@ public class CurrentManager implements Sendable {
 //    }
 
     private class PrioritizedManageable {
-        private Manageable m;
-        private boolean priority;
-        public PrioritizedManageable (Manageable m, boolean priority) {
-            this.m = m;
-            this.priority = priority;
+
+        private Manageable m_manageable;
+
+        private boolean m_priority;
+
+        private double m_absoluteMaxCurrent;
+
+        private PrioritizedManageable (Manageable manageable, boolean priority, double absoluteMaxCurrent) {
+            this.m_manageable = manageable;
+            this.m_priority = priority;
+            this.m_absoluteMaxCurrent = absoluteMaxCurrent;
         }
 
-        public Manageable getManageable() {
-            return m;
+        private Manageable getManageable() {
+            return m_manageable;
         }
 
-        public boolean getPriority() {
-            return priority;
+        private boolean isPriority() {
+            return m_priority;
+        }
+
+        private double getAbsoluteMaxCurrent() {
+            return m_absoluteMaxCurrent;
         }
     }
 
@@ -132,9 +176,5 @@ public class CurrentManager implements Sendable {
         builder.addDoubleProperty("Total Current Draw", this::getTotalCurrentDraw, null);
         builder.addDoubleProperty("Prioritized Current Draw", this::getPrioritizedTotal, null);
         builder.addDoubleProperty("Deprioritized Current Draw", this::getMaxBatteryCurrent, null);
-
     }
-
-
-
 }

@@ -25,24 +25,18 @@ public class CurrentTalonSRX extends PIDTalonSRX implements Manageable {
         }
     }
 
-    @Override
-    public double getAbsoluteMaxCurrent() {
-        return this.m_absoluteMaxCurrent;
-    }
-
-    @Override
     public void setAdjustedMaxCurrent(double maxCurrent) {
         this.adjustedMaxCurrent = maxCurrent;
     }
 
-    @Override
+
     public double getAdjustedMaxCurrent() {
         return this.adjustedMaxCurrent;
     }
 
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-        builder.addDoubleProperty("absolute max current", this::getAbsoluteMaxCurrent, null);
         builder.addDoubleProperty("adjusted max current", this::getAdjustedMaxCurrent, null);
     }
+
 }
