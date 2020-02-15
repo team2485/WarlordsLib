@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 /**
  * Basic wrapper for a CAN SparkMax implementing SpeedController and Sendable.
  */
-public class WPI_SparkMax extends RampedSparkMax implements SpeedController, Sendable {
+public class WPI_SparkMax extends CANSparkMax implements SpeedController, Sendable {
 
     /**
      * Create a new SPARK MAX Controller
