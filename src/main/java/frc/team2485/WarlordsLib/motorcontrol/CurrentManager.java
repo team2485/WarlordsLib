@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib;
+package frc.team2485.WarlordsLib.motorcontrol;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -69,13 +69,13 @@ public class CurrentManager implements Sendable {
 
                 for (int i = m_deprioritizedCount; i < m_manageables.size(); i++) {
                     Manageable m = m_manageables.get(i).getManageable();
-                    m.setMaxCurrent(m.getOutputCurrent() * prioritizedCut);
+                    m.setAdjustedMaxCurrent(m.getOutputCurrent() * prioritizedCut);
                 }
             }
             //will always cut deprioritized
             for(int i = 0; i < m_deprioritizedCount; i++) {
                 Manageable m = m_manageables.get(i).getManageable();
-                m.setMaxCurrent(m.getOutputCurrent() * deprioritizedCut);
+                m.setAdjustedMaxCurrent(m.getOutputCurrent() * deprioritizedCut);
             }
         }
     }

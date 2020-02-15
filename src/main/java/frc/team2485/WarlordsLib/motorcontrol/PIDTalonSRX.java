@@ -62,13 +62,13 @@ public class PIDTalonSRX extends WL_TalonSRX {
         return this._setpoint;
     }
 
-    public void setReference() {
+    public void runPID() {
         this.set(controlMode, _setpoint);
     }
 
-    public void setReference(double target) {
+    public void runPID(double target) {
         this.setSetpoint(target);
-        this.setReference();
+        this.runPID();
     }
 
     public ControlMode getControlMode() {
