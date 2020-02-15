@@ -20,7 +20,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum;
+    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, kFilt, filteredInput;
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -45,6 +45,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_kMaxOutput = this.m_controller.getOutputMax();
         this.m_kMinOutput = this.m_controller.getOutputMin();
         this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
+
+        this.kFilt = 0;
+        this.filteredInput = 0;
     }
 
     /**
@@ -294,15 +297,22 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         m_encoder.setPosition(position);
     }
 
-    /**
-     * get PID output based on control mode
-     * @param controlType control mode
-     * @return output
-     */
-    public double getOutput(ControlType controlType) {
+    public double getkFilter() {
+        return this.kFilt;
+    }
+
+    public void setkFilter(double kFilt) {
+        this.kFilt = kFilt;
+    }
+
+    public double getFilteredOutputCurrent() {
+        filteredInput += (this.getOutputCurrent() - filteredInput) *kFilt;
+        return filteredInput;
+    }
+    public double getSensorOutput(ControlType controlType) {
         switch (controlType) {
             case kCurrent:
-                return this.getOutputCurrent();
+                return this.getFilteredOutputCurrent();
             case kSmartVelocity:
             case kVelocity:
                 return m_encoder.getVelocity();
@@ -326,7 +336,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     public double getSensorOutput()  {
         switch (m_controlType) {
             case kCurrent:
-                return this.getOutputCurrent();
+                return this.getFilteredOutputCurrent();
             case kSmartVelocity:
             case kVelocity:
                 return m_encoder.getVelocity();
@@ -354,8 +364,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
         builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
-        builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
+        builder.addDoubleProperty("closedLoopRampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.addDoubleProperty("kFilter", this::getkFilter,this::setkFilter);
+        builder.addDoubleProperty("Output", this::getSensorOutput, null);
     }
 
 
@@ -368,6 +380,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.setIzone(configs.getDouble("iZone", this.getIzone()));
         this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
         this.setClosedLoopRampRate(configs.getDouble("rampRate", this.getClosedLoopRampRate()));
+        this.setkFilter(configs.getDouble("kFilter", this.getkFilter()));
+        this.setClosedLoopRampRate(configs.getDouble("closedLoopRampRate", this.getClosedLoopRampRate()));
     }
 
     @Override
@@ -379,5 +393,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
         configs.put("rampRate", this.getClosedLoopRampRate());
+        configs.put("kFilter", this.getkFilter());
+        configs.put("closedLoopRampRate", this.getClosedLoopRampRate());
     }
 }
