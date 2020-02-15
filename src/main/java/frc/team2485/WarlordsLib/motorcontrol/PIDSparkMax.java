@@ -19,7 +19,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double m_kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
+    private double kP, kI, kD, kIz, kF, kMaxOutput, kMinOutput, kIMaxAccum;
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -37,7 +37,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
         this.m_controller.setIAccum(0);
 
-        this.m_kP = this.m_controller.getP();
+        this.kP = this.m_controller.getP();
         this.kI = this.m_controller.getI();
         this.kD = this.m_controller.getD();
         this.kIz = this.m_controller.getIZone();
@@ -58,9 +58,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     @Override
     public void setP(double kP) {
-        if (this.m_kP != kP) {
+        if (this.kP != kP) {
             m_controller.setP(kP);
-            this.m_kP = kP;
+            this.kP = kP;
         }
     }
 
@@ -139,7 +139,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     public void setPIDF(double p, double i, double d, double f) {
-        if ((this.m_kP != m_kP) || (this.kI != kI) || (this.kD != kD) || (this.kF != kF)) {
+        if ((this.kP != kP) || (this.kI != kI) || (this.kD != kD) || (this.kF != kF)) {
             m_controller.setP(p);
             m_controller.setI(i);
             m_controller.setD(d);

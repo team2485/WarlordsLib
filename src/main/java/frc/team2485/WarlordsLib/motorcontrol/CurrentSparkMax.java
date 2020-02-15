@@ -1,14 +1,15 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class CurrentSparkMax extends PIDSparkMax implements Manageable {
     private double m_absoluteMaxCurrent;
-    private double adjustedMaxCurrent;
+    private double m_adjustedMaxCurrent;
     public CurrentSparkMax(int deviceID, int maxCurrent) {
         super(deviceID, ControlType.kCurrent);
         this.m_absoluteMaxCurrent = maxCurrent;
-        this.adjustedMaxCurrent = m_absoluteMaxCurrent;
+        this.m_adjustedMaxCurrent = m_absoluteMaxCurrent;
     }
 
     public void setPWM(double pwm) {
@@ -16,8 +17,8 @@ public class CurrentSparkMax extends PIDSparkMax implements Manageable {
     }
 
     public void setCurrent(double current) {
-        if(current > adjustedMaxCurrent) {
-            this.runPID(adjustedMaxCurrent);
+        if(current > m_adjustedMaxCurrent) {
+            this.runPID(m_adjustedMaxCurrent);
         } else {
             this.runPID(current);
         }
@@ -30,11 +31,17 @@ public class CurrentSparkMax extends PIDSparkMax implements Manageable {
 
     @Override
     public void setAdjustedMaxCurrent(double maxCurrent) {
-        this.adjustedMaxCurrent = maxCurrent;
+        this.m_adjustedMaxCurrent = maxCurrent;
     }
 
     @Override
     public double getAdjustedMaxCurrent() {
-        return this.adjustedMaxCurrent;
+        return this.m_adjustedMaxCurrent;
+    }
+
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.addDoubleProperty("absolute max current", this::getAbsoluteMaxCurrent, null);
+        builder.addDoubleProperty("adjusted max current", this::getAdjustedMaxCurrent, null);
     }
 }

@@ -2,6 +2,7 @@ package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class CurrentTalonSRX extends PIDTalonSRX implements Manageable {
     private double m_absoluteMaxCurrent;
@@ -37,5 +38,11 @@ public class CurrentTalonSRX extends PIDTalonSRX implements Manageable {
     @Override
     public double getAdjustedMaxCurrent() {
         return this.adjustedMaxCurrent;
+    }
+
+    public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.addDoubleProperty("absolute max current", this::getAbsoluteMaxCurrent, null);
+        builder.addDoubleProperty("adjusted max current", this::getAdjustedMaxCurrent, null);
     }
 }
