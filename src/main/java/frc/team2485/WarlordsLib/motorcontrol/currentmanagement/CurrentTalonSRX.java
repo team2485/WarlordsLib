@@ -1,13 +1,13 @@
-package frc.team2485.WarlordsLib.motorcontrol;
+package frc.team2485.WarlordsLib.motorcontrol.currentmanagement;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import frc.team2485.WarlordsLib.motorcontrol.PIDTalonSRX;
 
 public class CurrentTalonSRX extends PIDTalonSRX implements Manageable {
     private double m_absoluteMaxCurrent;
     private double adjustedMaxCurrent;
-    public CurrentTalonSRX(int deviceID, int maxCurrent) {
+    public CurrentTalonSRX(int deviceID, double maxCurrent) {
         super(deviceID, ControlMode.Current);
         this.m_absoluteMaxCurrent = maxCurrent;
         this.adjustedMaxCurrent = m_absoluteMaxCurrent;

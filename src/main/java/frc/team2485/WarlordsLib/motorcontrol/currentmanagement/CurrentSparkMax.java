@@ -1,12 +1,13 @@
-package frc.team2485.WarlordsLib.motorcontrol;
+package frc.team2485.WarlordsLib.motorcontrol.currentmanagement;
 
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import frc.team2485.WarlordsLib.motorcontrol.PIDSparkMax;
 
 public class CurrentSparkMax extends PIDSparkMax implements Manageable {
     private double m_absoluteMaxCurrent;
     private double m_adjustedMaxCurrent;
-    public CurrentSparkMax(int deviceID, int maxCurrent) {
+    public CurrentSparkMax(int deviceID, double maxCurrent) {
         super(deviceID, ControlType.kCurrent);
         this.m_absoluteMaxCurrent = maxCurrent;
         this.m_adjustedMaxCurrent = m_absoluteMaxCurrent;

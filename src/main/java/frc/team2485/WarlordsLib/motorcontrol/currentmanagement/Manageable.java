@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib.motorcontrol;
+package frc.team2485.WarlordsLib.motorcontrol.currentmanagement;
 
 public interface Manageable {
 
