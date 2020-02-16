@@ -84,9 +84,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public void setP(double kP) {
-        if (this.m_kP != kP) {
+        if (this.kP != kP) {
             m_controller.setP(kP);
-            this.m_kP = kP;
+            this.kP = kP;
         }
     }
 

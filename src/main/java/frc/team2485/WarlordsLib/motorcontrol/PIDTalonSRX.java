@@ -166,6 +166,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         this.setF(f);
     }
 
+
     public void setIzone(double kIz) {
         if(this.kIz != kIz) {
             this.config_IntegralZone(pidIdx, (int) kIz);
@@ -176,6 +177,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
     public double getIzone() {
         return this.kIz;
     }
+
 
     public void setIMaxAccum(double kIMaxAccum) {
         if(this.kIMaxAccum != kIMaxAccum) {
