@@ -263,6 +263,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
         builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.addDoubleProperty("output current", this::getOutputCurrent, null);
     }
 
     @Override
