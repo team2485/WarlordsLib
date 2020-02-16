@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import java.util.ArrayList;
 
+/**
+ * A global singleton current manager.
+ */
 public class CurrentManager implements Sendable {
 
     private static volatile CurrentManager m_instance;
@@ -14,8 +17,6 @@ public class CurrentManager implements Sendable {
     private double DEFAULT_MAX_BATTERY_CURRENT = 120;
 
     private double m_totalCurrentDraw, m_prioritizedTotal, m_deprioritizedTotal;
-
-    private int m_prioritizedCount, m_deprioritizedCount;
 
     private ArrayList<PrioritizedManageable> m_manageables;
 
@@ -43,11 +44,6 @@ public class CurrentManager implements Sendable {
     }
 
     public void add(Manageable m, boolean priority, double absoluteMaxCurrent) {
-        if(priority) {
-            m_prioritizedCount++;
-        } else {
-            m_deprioritizedCount++;
-        }
 
         m_manageables.add(new PrioritizedManageable(m, priority, absoluteMaxCurrent));
 //       perhaps later weight code
