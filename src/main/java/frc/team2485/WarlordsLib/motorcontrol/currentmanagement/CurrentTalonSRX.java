@@ -29,7 +29,6 @@ public class CurrentTalonSRX extends PIDTalonSRX implements Manageable {
         this.adjustedMaxCurrent = maxCurrent;
     }
 
-
     public double getAdjustedMaxCurrent() {
         return this.adjustedMaxCurrent;
     }

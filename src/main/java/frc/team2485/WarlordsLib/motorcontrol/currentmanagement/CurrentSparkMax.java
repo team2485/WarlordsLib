@@ -5,8 +5,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import frc.team2485.WarlordsLib.motorcontrol.PIDSparkMax;
 
 public class CurrentSparkMax extends PIDSparkMax implements Manageable {
+
     private double m_absoluteMaxCurrent;
     private double m_adjustedMaxCurrent;
+
     public CurrentSparkMax(int deviceID, double maxCurrent) {
         super(deviceID, ControlType.kCurrent);
         this.m_absoluteMaxCurrent = maxCurrent;
@@ -28,7 +30,6 @@ public class CurrentSparkMax extends PIDSparkMax implements Manageable {
     public void setAdjustedMaxCurrent(double maxCurrent) {
         this.m_adjustedMaxCurrent = maxCurrent;
     }
-
 
     public double getAdjustedMaxCurrent() {
         return this.m_adjustedMaxCurrent;
