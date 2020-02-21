@@ -27,8 +27,6 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     private double m_threshold;
 
-    private double m_encoderOffset;
-
     /**
      * Constructor for TalonSRX object
      *
@@ -217,12 +215,12 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
 
     @Override
     public void setSetpoint(double setpoint) {
-        this.m_setpoint = (setpoint - m_encoderOffset ) / m_conversionFactor ;
+        this.m_setpoint = (setpoint  ) / m_conversionFactor ;
     }
 
     @Override
     public double getSetpoint() {
-        return this.m_setpoint * m_conversionFactor + m_encoderOffset;
+        return this.m_setpoint * m_conversionFactor;
     }
 
     /**
@@ -281,7 +279,6 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
      */
     public void setEncoderPosition(double position) {
         this.setSelectedSensorPosition(this.getSensorCollection().getPulseWidthPosition());
-        this.m_encoderOffset = position - (this.getSelectedSensorPosition() * m_conversionFactor);
     }
 
     /**
@@ -289,7 +286,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
      * @return encoder position
      */
     public double getEncoderPosition() {
-        return (this.getSelectedSensorPosition() * m_conversionFactor) + m_encoderOffset;
+        return (this.getSelectedSensorPosition() * m_conversionFactor) ;
     }
 
     /**
@@ -379,7 +376,6 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         this.setIzone(configs.getDouble("iZone", this.getIzone()));
         this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
         this.setClosedLoopRampRate((configs.getDouble("rampRate", this.getClosedLoopRampRate())));
-        this.m_encoderOffset = configs.getDouble("encoder offset", this.m_encoderOffset);
     }
 
     @Override
@@ -391,6 +387,5 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
         configs.put("rampRate", this.getClosedLoopRampRate());
-        configs.put("encoder offset", this.m_encoderOffset);
     }
 }
