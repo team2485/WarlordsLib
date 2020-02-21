@@ -11,6 +11,9 @@ public class Limelight {
 
     private NetworkTableInstance m_networkTableInstance;
     private NetworkTable m_limelightTable;
+    private String m_hostName;
+
+    private static final String DEFAULT_HOSTNAME = "limelight";
 
     private enum LimelightVersion {
         ONE(54, 41), TWO(59.6, 49.7);
@@ -38,17 +41,22 @@ public class Limelight {
      * Wrapper for Limelight.
      * @param limelightVersion version of this limelight.
      */
-    public Limelight(LimelightVersion limelightVersion) {
+    public Limelight(LimelightVersion limelightVersion, String hostname) {
         m_limelightVersion = limelightVersion;
         m_networkTableInstance = NetworkTableInstance.getDefault();
-        m_limelightTable = m_networkTableInstance.getTable("limelight");
+        m_hostName = hostname;
+        m_limelightTable = m_networkTableInstance.getTable(hostname);
+    }
+
+    public Limelight(String hostname) {
+        this(LimelightVersion.TWO, hostname);
     }
 
     /**
      * Wrapper for Limelight.
      */
     public Limelight() {
-        this(LimelightVersion.TWO);
+        this(DEFAULT_HOSTNAME);
     }
 
     public LimelightVersion getLimelightVersion() {
