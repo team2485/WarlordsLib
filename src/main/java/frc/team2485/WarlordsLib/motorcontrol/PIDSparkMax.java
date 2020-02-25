@@ -22,6 +22,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, kFilt, filteredInput;
 
+    private double m_threshold;
+
     /**
      * Create a new Brushless SPARK MAX Controller
      * @param deviceID The device ID.
@@ -309,6 +311,41 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         filteredInput += (this.getOutputCurrent() - filteredInput) *kFilt;
         return filteredInput;
     }
+
+    /**
+     * Set threshold for atTarget()
+     * @param tolerance  pid is at target if within sensor output +/- this value
+     */
+    public void setTolerance(double tolerance) {
+        this.m_threshold = Math.abs(tolerance);
+    }
+
+    /**
+     * Get threshold for controller
+     * @return threshold
+     */
+    public double getThreshold(){
+        return this.m_threshold;
+    }
+
+    /**
+     * Returns true if sensor output is within a given threshold
+     * @return true when sensor is within threshold
+     */
+    public boolean atTarget() {
+        return atTarget(this.m_threshold);
+    }
+
+    /**
+     * Returns true if sensor output is within a given threshold
+     * @param threshold pid is at target if within sensor output +/- this value
+     * @return true when sensor is within threshold
+     */
+    public boolean atTarget(double threshold) {
+        return Math.abs(this.getSensorOutput() - this.getSetpoint()) < threshold;
+    }
+
+
     public double getSensorOutput(ControlType controlType) {
         switch (controlType) {
             case kCurrent:
