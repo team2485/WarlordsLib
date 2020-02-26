@@ -278,7 +278,7 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
      * @param position desired position
      */
     public void setEncoderPosition(double position) {
-        this.setSelectedSensorPosition(this.getSensorCollection().getPulseWidthPosition());
+        this.setSelectedSensorPosition((int) (position / m_conversionFactor));
     }
 
     /**
