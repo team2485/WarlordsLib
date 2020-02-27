@@ -1,6 +1,10 @@
 package frc.team2485.WarlordsLib;
 
-public class RampRate {
+import frc.team2485.WarlordsLib.robotConfigs.Configurable;
+import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
+import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
+
+public class RampRate implements Sendable, Configurable {
     private double m_lastValue, m_upRampRate, m_downRampRate;
 
     private double m_maxErrorToDesired;
@@ -13,6 +17,22 @@ public class RampRate {
     public void setRampRates(double upRampRate, double downRampRate) {
         m_upRampRate = upRampRate;
         m_downRampRate = downRampRate;
+    }
+
+    public void setUpRampRate(double upRampRate) {
+        m_upRampRate = upRampRate;
+    }
+
+    public void setDownRampRate(double downRampRate) {
+        m_downRampRate = downRampRate;
+    }
+
+    public double getUpRampRate() {
+        return m_upRampRate;
+    }
+
+    public double getDownRampRate(){
+        return m_downRampRate;
     }
 
     public double getNextValue(double target) {
@@ -63,6 +83,22 @@ public class RampRate {
     public void setLastValue(double lastValue) {
         m_lastValue = lastValue;
     }
-    
+
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("up ramp rate", this::getUpRampRate, this::setUpRampRate );
+        builder.addDoubleProperty("down ramp rate", this::getDownRampRate, this::getDownRampRate);
+
+    }
+
+    public void loadConfigs(LoadableConfigs configs) {
+        this.setUpRampRate(configs.getDouble("upRampRate", this.getUpRampRate()));
+        this.setDownRampRate(configs.getDouble("downRampRate", this.getDownRampRate());
+    }
+
+    public void saveConfigs(SavableConfigs configs) {
+        configs.put("upRampRate", this.getUpRampRate());
+        configs.put("downRampRate", this.getDownRampRate());
+
+    }
 
 }
