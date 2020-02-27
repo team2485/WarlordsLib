@@ -1,5 +1,7 @@
 package frc.team2485.WarlordsLib;
 
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
@@ -86,13 +88,13 @@ public class RampRate implements Sendable, Configurable {
 
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("up ramp rate", this::getUpRampRate, this::setUpRampRate );
-        builder.addDoubleProperty("down ramp rate", this::getDownRampRate, this::getDownRampRate);
+        builder.addDoubleProperty("down ramp rate", this::getDownRampRate, this::setDownRampRate);
 
     }
 
     public void loadConfigs(LoadableConfigs configs) {
         this.setUpRampRate(configs.getDouble("upRampRate", this.getUpRampRate()));
-        this.setDownRampRate(configs.getDouble("downRampRate", this.getDownRampRate());
+        this.setDownRampRate(configs.getDouble("downRampRate", this.getDownRampRate()));
     }
 
     public void saveConfigs(SavableConfigs configs) {
