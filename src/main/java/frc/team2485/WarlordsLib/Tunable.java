@@ -6,4 +6,6 @@ public interface Tunable {
      * Should run periodically and run the motor to tune
      */
     void tunePeriodic();
+
+    void setPWM(double pwm);
 }
