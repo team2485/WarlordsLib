@@ -7,5 +7,5 @@ public interface Tunable {
      */
     void tunePeriodic();
 
-    void setPWM(double pwm);
+    default void setPWM(double pwm) {};
 }
