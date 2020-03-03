@@ -8,4 +8,6 @@ public interface Tunable {
     void tunePeriodic(int layer);
 
     void setPWM(double pwm);
+
+    void resetPIDs();
 }
