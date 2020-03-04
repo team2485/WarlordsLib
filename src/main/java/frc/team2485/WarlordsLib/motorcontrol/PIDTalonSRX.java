@@ -270,7 +270,6 @@ public class PIDTalonSRX extends WL_TalonSRX implements Configurable, PIDMotorCo
     @Override
     public void resetPID() {
         this.setIntegralAccumulator(0);
-        this.set(0);
     }
 
     /**
