@@ -77,7 +77,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public double getP() {
-        return m_controller.getP();
+        return this.m_kP;
     }
 
     /**
@@ -98,7 +98,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public double getI() {
-        return m_controller.getI();
+        return this.m_kI;
 
     }
 
@@ -120,7 +120,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public double getD() {
-        return m_controller.getD();
+        return this.m_kD;
     }
 
     /**
@@ -140,7 +140,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return IZone value
      */
     public double getIzone() {
-        return m_controller.getIZone();
+        return this.m_kIz;
     }
 
     /**
@@ -159,7 +159,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return max I Accumulator
      */
     public double getIMaxAccum() {
-        return m_controller.getIMaxAccum(0);
+        return this.m_kIMaxAccum;
     }
 
     /**
@@ -178,7 +178,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return Fees-forward Gain
      */
     public double getF() {
-        return m_controller.getFF();
+        return this.m_kF;
     }
 
     /**
