@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * A custom 2d hashmap of constants for the robot. The first key is the category name (eg Subsystem name) and the second key is the constant name.
  */
-public class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
+class RobotConfigsMap extends HashMap<String, HashMap<String,String>> {
 
     /**
      * sets value to desired constant in provided subsystem

@@ -20,7 +20,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, kFilt, filteredInput;
+    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, m_kFilt, m_filteredInput;
 
     private double m_threshold;
 
@@ -48,8 +48,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_kMinOutput = this.m_controller.getOutputMin();
         this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
 
-        this.kFilt = 0;
-        this.filteredInput = 0;
+        this.m_kFilt = 0;
+        this.m_filteredInput = 0;
     }
 
     /**
@@ -300,16 +300,16 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     public double getkFilter() {
-        return this.kFilt;
+        return this.m_kFilt;
     }
 
     public void setkFilter(double kFilt) {
-        this.kFilt = kFilt;
+        this.m_kFilt = kFilt;
     }
 
     public double getFilteredOutputCurrent() {
-        filteredInput += (this.getOutputCurrent() - filteredInput) *kFilt;
-        return filteredInput;
+        m_filteredInput += (this.getOutputCurrent() - m_filteredInput) * m_kFilt;
+        return m_filteredInput;
     }
 
     /**
@@ -344,7 +344,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     public boolean atTarget(double threshold) {
         return Math.abs(this.getSensorOutput() - this.getSetpoint()) < threshold;
     }
-
 
     public double getSensorOutput(ControlType controlType) {
         switch (controlType) {
