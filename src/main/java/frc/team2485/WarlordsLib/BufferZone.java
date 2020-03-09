@@ -26,9 +26,15 @@ public class BufferZone {
         this.m_bufferSize = bufferSize;
     }
 
+    /**
+     * Get the next buffered value
+     * @param input the desired output
+     * @param position the current position of the system
+     * @return a clamped value based on the position of the system.
+     */
     public double get(double input, double position) {
         return MathUtil.clamp(input,
-                Math.max(m_minOutput, (m_minOutput / m_bufferSize) * (position - m_minPosition)),
-                Math.min(m_maxOutput, - (m_maxOutput /m_bufferSize) * (position - m_maxPosition)));
+                Math.min(Math.max(m_minOutput, (m_minOutput / m_bufferSize) * (position - m_minPosition)), 0),
+                Math.max(Math.min(m_maxOutput, - (m_maxOutput /m_bufferSize) * (position - m_maxPosition)), 0));
     }
 }
