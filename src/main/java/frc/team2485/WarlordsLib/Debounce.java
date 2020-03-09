@@ -1,5 +1,8 @@
 package frc.team2485.WarlordsLib;
 
+/**
+ * This class "averages" the values of a noisy boolean sensor.
+ */
 public class Debounce {
 
     private boolean m_output;
@@ -8,9 +11,13 @@ public class Debounce {
 
     private int m_maxDebounceCounter;
 
-    public Debounce(boolean initValue, int maxDebounceTime) {
+    /**
+     * @param initValue the first value
+     * @param maxDebounceCount the number of successive counts to consider a boolean changed
+     */
+    public Debounce(boolean initValue, int maxDebounceCount) {
         this.m_output = initValue;
-        this.m_maxDebounceCounter = maxDebounceTime;
+        this.m_maxDebounceCounter = maxDebounceCount;
         this.m_counter = !initValue ? 0 : m_maxDebounceCounter;
     }
 
@@ -32,7 +39,4 @@ public class Debounce {
 
         return m_output;
     }
-
-
-
 }
