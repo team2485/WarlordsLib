@@ -1,6 +1,6 @@
 package frc.team2485.WarlordsLib.motorcontrol.base;
 
-public interface PIDMotorController {
+public interface PIDMotorController<ControlMode, FeedbackEnum> {
 
     /**
      * Set proportional coefficient
@@ -56,19 +56,30 @@ public interface PIDMotorController {
     void runPID();
 
     /**
+     * Run the PID of the motor controller based on the setpoint
+     */
+    void runPID(double target);
+
+    /**
      * Get output of PID based on mode
      * @return pid output
      */
-    double getOutput();
+    double getSensorOutput();
 
     /**
      * Reset integrators and pid here.
      */
-    void reset();
+    void resetPID();
 
     /**
      * Reset encoder position here
      * @param position set encoder position
      */
     void setEncoderPosition(double position);
+
+    void setFeedbackDeviceType(FeedbackEnum feedbackDeviceType);
+
+    ControlMode getControlMode();
+
+    void setControlMode(ControlMode controlMode);
 }

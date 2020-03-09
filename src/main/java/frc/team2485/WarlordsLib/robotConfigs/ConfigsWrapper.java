@@ -1,6 +1,6 @@
 package frc.team2485.WarlordsLib.robotConfigs;
 
-public class ConfigsWrapper implements LoadableConfigs, SavableConfigs {
+class ConfigsWrapper implements LoadableConfigs, SavableConfigs {
 
     private RobotConfigs m_robotConfigs;
 

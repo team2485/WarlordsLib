@@ -6,6 +6,13 @@ package frc.team2485.WarlordsLib.oi;
  */
 public class Deadband {
 
+    public static double deadband(double value, double threshold) {
+        if (value < threshold && value > -threshold) {
+            return 0;
+        }
+        return value;
+    }
+
     /**
      * Simple deadband with linear scale.
      * @param value input value from joystick/controller

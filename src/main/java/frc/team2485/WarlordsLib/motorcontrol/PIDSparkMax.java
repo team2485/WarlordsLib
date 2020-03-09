@@ -3,13 +3,14 @@ package frc.team2485.WarlordsLib.motorcontrol;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
+import com.revrobotics.EncoderType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
-public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController {
+public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController<ControlType, EncoderType> {
 
     private ControlType m_controlType;
 
@@ -19,7 +20,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
 
     private double m_setpoint;
 
-    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum;
+    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, m_kFilt, m_filteredInput;
+
+    private double m_threshold;
 
     /**
      * Create a new Brushless SPARK MAX Controller
@@ -44,15 +47,28 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.m_kMaxOutput = this.m_controller.getOutputMax();
         this.m_kMinOutput = this.m_controller.getOutputMin();
         this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
+
+        this.m_kFilt = 0;
+        this.m_filteredInput = 0;
     }
 
     /**
      * Set the PID's feedback device
-     * @param feedbackDevice feedbackDevice
+     * @param feedbackDeviceType feedbackDevice
      */
-    public void setFeedbackDevice(CANEncoder feedbackDevice) {
-        this.m_encoder = feedbackDevice;
-        m_controller.setFeedbackDevice(feedbackDevice);
+    @Override
+    public void setFeedbackDeviceType(EncoderType feedbackDeviceType) {
+        m_controller.setFeedbackDevice(new CANEncoder(this, feedbackDeviceType, 0)); // the counts per rev is not used
+    }
+
+    @Override
+    public ControlType getControlMode() {
+        return this.m_controlType;
+    }
+
+    @Override
+    public void setControlMode(ControlType controlType) {
+        this.m_controlType = controlType;
     }
 
     /**
@@ -61,7 +77,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public double getP() {
-        return m_controller.getP();
+        return this.m_kP;
     }
 
     /**
@@ -82,7 +98,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public double getI() {
-        return m_controller.getI();
+        return this.m_kI;
 
     }
 
@@ -104,7 +120,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      */
     @Override
     public double getD() {
-        return m_controller.getD();
+        return this.m_kD;
     }
 
     /**
@@ -124,7 +140,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return IZone value
      */
     public double getIzone() {
-        return m_controller.getIZone();
+        return this.m_kIz;
     }
 
     /**
@@ -143,7 +159,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return max I Accumulator
      */
     public double getIMaxAccum() {
-        return m_controller.getIMaxAccum(0);
+        return this.m_kIMaxAccum;
     }
 
     /**
@@ -162,7 +178,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return Fees-forward Gain
      */
     public double getF() {
-        return m_controller.getFF();
+        return this.m_kF;
     }
 
     /**
@@ -232,19 +248,6 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
     }
 
     /**
-     * @return the control type the PIDController is using.
-     */
-    public ControlType getControlType() { return this.m_controlType; }
-
-    /**
-     * Set the control type of the PID
-     * @param controlType control type
-     */
-    public void setControlType(ControlType controlType) {
-        this.m_controlType = controlType;
-    }
-
-    /**
      * Run PID on this controller from setpoint
      */
     @Override
@@ -256,6 +259,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * Set setpoint and run PID on this controller
      * @param target
      */
+    @Override
     public void runPID(double target) {
         setSetpoint(target);
         runPID();
@@ -282,7 +286,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * resets PID controller.
      */
     @Override
-    public void reset() {
+    public void resetPID() {
         this.m_controller.setIAccum(0);
     }
 
@@ -295,15 +299,56 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         m_encoder.setPosition(position);
     }
 
+    public double getkFilter() {
+        return this.m_kFilt;
+    }
+
+    public void setkFilter(double kFilt) {
+        this.m_kFilt = kFilt;
+    }
+
+    public double getFilteredOutputCurrent() {
+        m_filteredInput += (this.getOutputCurrent() - m_filteredInput) * m_kFilt;
+        return m_filteredInput;
+    }
+
     /**
-     * get PID output based on control mode
-     * @param controlType control mode
-     * @return output
+     * Set threshold for atTarget()
+     * @param tolerance  pid is at target if within sensor output +/- this value
      */
-    public double getOutput(ControlType controlType) {
+    public void setTolerance(double tolerance) {
+        this.m_threshold = Math.abs(tolerance);
+    }
+
+    /**
+     * Get threshold for controller
+     * @return threshold
+     */
+    public double getThreshold(){
+        return this.m_threshold;
+    }
+
+    /**
+     * Returns true if sensor output is within a given threshold
+     * @return true when sensor is within threshold
+     */
+    public boolean atTarget() {
+        return atTarget(this.m_threshold);
+    }
+
+    /**
+     * Returns true if sensor output is within a given threshold
+     * @param threshold pid is at target if within sensor output +/- this value
+     * @return true when sensor is within threshold
+     */
+    public boolean atTarget(double threshold) {
+        return Math.abs(this.getSensorOutput() - this.getSetpoint()) < threshold;
+    }
+
+    public double getSensorOutput(ControlType controlType) {
         switch (controlType) {
             case kCurrent:
-                return this.getOutputCurrent();
+                return this.getFilteredOutputCurrent();
             case kSmartVelocity:
             case kVelocity:
                 return m_encoder.getVelocity();
@@ -324,10 +369,10 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @return output of pid
      */
     @Override
-    public double getOutput()  {
+    public double getSensorOutput()  {
         switch (m_controlType) {
             case kCurrent:
-                return this.getOutputCurrent();
+                return this.getFilteredOutputCurrent();
             case kSmartVelocity:
             case kVelocity:
                 return m_encoder.getVelocity();
@@ -343,16 +388,24 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         }
     }
 
+    public CANPIDController getController() {
+        return m_controller;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.setSmartDashboardType("PIDController");
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
         builder.addDoubleProperty("f", this::getF, this::setF);
         builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
         builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
-        builder.addDoubleProperty("rampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
+        builder.addDoubleProperty("closedLoopRampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.addDoubleProperty("kFilter", this::getkFilter,this::setkFilter);
+        builder.addDoubleProperty("Output", this::getSensorOutput, null);
     }
 
 
@@ -364,6 +417,9 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         this.setF(configs.getDouble("f", this.getF()));
         this.setIzone(configs.getDouble("iZone", this.getIzone()));
         this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
+        this.setClosedLoopRampRate(configs.getDouble("rampRate", this.getClosedLoopRampRate()));
+        this.setkFilter(configs.getDouble("kFilter", this.getkFilter()));
+        this.setClosedLoopRampRate(configs.getDouble("closedLoopRampRate", this.getClosedLoopRampRate()));
     }
 
     @Override
@@ -374,5 +430,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         configs.put("f", this.getF());
         configs.put("iZone", this.getIzone());
         configs.put("iMaxAccum", this.getIMaxAccum());
+        configs.put("rampRate", this.getClosedLoopRampRate());
+        configs.put("kFilter", this.getkFilter());
+        configs.put("closedLoopRampRate", this.getClosedLoopRampRate());
     }
 }
