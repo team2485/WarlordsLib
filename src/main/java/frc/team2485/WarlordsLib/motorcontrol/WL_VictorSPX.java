@@ -22,9 +22,9 @@ public class WL_VictorSPX extends WPI_VictorSPX {
     /**
      * The given motor controllers will now follow this motor controller.
      */
-    public void setFollowers(BaseMotorController slave, BaseMotorController... slaves) {
-        slave.follow(this);
-        for (BaseMotorController m : slaves) {
+    public void setFollowers(BaseMotorController follower, BaseMotorController... followers) {
+        follower.follow(this);
+        for (BaseMotorController m : followers) {
             m.follow(this);
         }
     }

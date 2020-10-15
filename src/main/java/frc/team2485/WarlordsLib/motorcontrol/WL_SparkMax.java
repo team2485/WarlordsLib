@@ -37,12 +37,13 @@ public class WL_SparkMax extends WPI_SparkMax {
 
     /**
      * Sets other sparks to follow this Spark.
-     * @param slave the follower motor
-     * @param slaves any number of follower motors
+     * 
+     * @param follower  the follower motor
+     * @param followers any number of follower motors
      */
-    public void setFollowers(WL_SparkMax slave, WL_SparkMax... slaves) {
-        slave.follow(this);
-        for (CANSparkMax m : slaves) {
+    public void setFollowers(WL_SparkMax follower, WL_SparkMax... followers) {
+        follower.follow(this);
+        for (CANSparkMax m : follower) {
             m.follow(this);
         }
     }

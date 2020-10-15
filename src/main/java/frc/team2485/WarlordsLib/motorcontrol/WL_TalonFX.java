@@ -2,24 +2,21 @@ package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import frc.team2485.WarlordsLib.sensors.TalonEncoder;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-/**
- * Warlords wrapper for TalonSRX with convenience functions.
- */
-public class WL_TalonSRX extends WPI_TalonSRX {
+public class WL_TalonFX extends WPI_TalonFX {
 
     /**
      * Constructor for TalonSRX object
      *
      * @param deviceNumber CAN Device ID of Device
      */
-    public WL_TalonSRX(int deviceNumber) {
+    public WL_TalonFX(int deviceNumber) {
         super(deviceNumber);
         this.configFactoryDefault();
         this.clearStickyFaults();
@@ -46,10 +43,8 @@ public class WL_TalonSRX extends WPI_TalonSRX {
      */
     public void setCurrentLimiting(int peakCurrentLimit, int peakCurrentDuration, int continuousCurrentLimit,
             boolean currentLimitsEnabled) {
-        this.configPeakCurrentLimit(peakCurrentLimit);
-        this.configPeakCurrentDuration(peakCurrentDuration);
-        this.configContinuousCurrentLimit(continuousCurrentLimit);
-        this.enableCurrentLimit(currentLimitsEnabled);
+        this.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(currentLimitsEnabled, continuousCurrentLimit,
+                peakCurrentLimit, peakCurrentDuration));
     }
 
     /**
