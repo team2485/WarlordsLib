@@ -45,7 +45,7 @@ public class ArmAndTrigger implements Sendable{
 
         } else {
 
-            if (input < m_arm) { //disarm if above arm value
+            if (input > m_arm) { //disarm if above arm value
                 m_armed = false;
             } else if (m_lastInput > m_arm && input <= m_arm) {//if just passed arm value, arm
                 m_armed = true;
