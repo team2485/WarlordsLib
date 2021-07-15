@@ -3,7 +3,6 @@ package frc.team2485.WarlordsLib.sensors;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.SensorCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Sendable;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
@@ -11,11 +10,11 @@ import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
 /**
- * A wrapper for interfacing with an encoder plugged into a TalonSRX or TalonFX.
+ * A wrapper for interfacing with an encoder plugged into a TalonSRX.
  */
-public class TalonEncoder extends SensorCollection implements EncoderWrapper, Configurable {
+public class TalonSRXEncoder extends SensorCollection implements EncoderWrapper, Configurable {
 
-    public enum TalonEncoderType {
+    public enum TalonSRXEncoderType {
         ABSOLUTE, QUADRATURE, ANALOG
     }
 
@@ -23,23 +22,22 @@ public class TalonEncoder extends SensorCollection implements EncoderWrapper, Co
 
     private int m_pulsesPerRevolution;
 
-    private TalonEncoderType m_encoderType;
+    private TalonSRXEncoderType m_encoderType;
 
     private double m_offset = 0;
 
-    public TalonEncoder(BaseTalon motorController, TalonEncoderType encoderType, int pulsesPerRevolution) {
+    public TalonSRXEncoder(TalonSRX motorController, TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
         super(motorController);
         this.m_pulsesPerRevolution = pulsesPerRevolution;
         this.m_encoderType = encoderType;
     }
 
-    public TalonEncoder(int deviceId, TalonEncoderType encoderType, int pulsesPerRevolution) {
+    public TalonSRXEncoder(int deviceId, TalonSRXEncoderType encoderType, int pulsesPerRevolution) {
         this(new TalonSRX(deviceId), encoderType, pulsesPerRevolution);
     }
 
     /**
      * Get position of encoder according to set distance per revolution
-     *
      * @return position
      */
     @Override
@@ -58,31 +56,26 @@ public class TalonEncoder extends SensorCollection implements EncoderWrapper, Co
 
     /**
      * Reset encoder position
-     *
      * @param position position to set to
      */
     @Override
     public void resetPosition(double position) {
         switch (m_encoderType) {
             case ABSOLUTE:
-                reportError(this
-                        .setPulseWidthPosition((int) (position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
+                reportError(this.setPulseWidthPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
                 this.m_offset = position - this.getPulseWidthPosition();
                 break;
             case QUADRATURE:
-                reportError(this
-                        .setQuadraturePosition((int) (position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
+                reportError(this.setQuadraturePosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution),50));
                 break;
             case ANALOG:
-                reportError(
-                        this.setAnalogPosition((int) (position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
+                reportError(this.setAnalogPosition((int)(position * m_pulsesPerRevolution / m_distancePerRevolution), 50));
                 break;
         }
     }
 
     /**
-     * Set scaling factor for encoder
-     *
+     *  Set scaling factor for encoder
      * @param distance distance per revolution
      */
     @Override
@@ -111,11 +104,11 @@ public class TalonEncoder extends SensorCollection implements EncoderWrapper, Co
     public double getVelocity() {
         switch (m_encoderType) {
             case ABSOLUTE:
-                return (this.getPulseWidthVelocity() * m_distancePerRevolution / m_pulsesPerRevolution) * 10;
+                return (this.getPulseWidthVelocity() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             case QUADRATURE:
-                return (this.getQuadratureVelocity() * m_distancePerRevolution / m_pulsesPerRevolution) * 10;
+                return (this.getQuadratureVelocity() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             case ANALOG:
-                return (this.getAnalogInVel() * m_distancePerRevolution / m_pulsesPerRevolution) * 10;
+                return (this.getAnalogInVel() * m_distancePerRevolution / m_pulsesPerRevolution)*10;
             default:
                 return 0;
         }
@@ -126,6 +119,7 @@ public class TalonEncoder extends SensorCollection implements EncoderWrapper, Co
             DriverStation.reportWarning("TalonSRX Encoder Wrapper Error: " + code.toString(), true);
         }
     }
+
 
     /**
      * Loads configs from RobotConfigs
