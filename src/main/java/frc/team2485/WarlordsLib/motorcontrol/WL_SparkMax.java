@@ -43,7 +43,7 @@ public class WL_SparkMax extends WPI_SparkMax {
      */
     public void setFollowers(WL_SparkMax follower, WL_SparkMax... followers) {
         follower.follow(this);
-        for (CANSparkMax m : follower) {
+        for (CANSparkMax m : followers) {
             m.follow(this);
         }
     }
