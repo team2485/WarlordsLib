@@ -7,7 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import frc.team2485.WarlordsLib.sensors.TalonEncoder;
+// import frc.team2485.WarlordsLib.sensors.TalonEncoder;
 
 /**
  * Warlords wrapper for TalonSRX with convenience functions.
@@ -72,7 +72,7 @@ public class WL_TalonSRX extends WPI_TalonSRX {
         this.enableVoltageCompensation(12.0);
     }
 
-    public TalonEncoder getEncoder(TalonEncoder.TalonEncoderType encoderType, int pulsesPerRevolution) {
-        return new TalonEncoder(this, encoderType, pulsesPerRevolution);
-    }
+    // public TalonEncoder getEncoder(TalonEncoder.TalonEncoderType encoderType, int pulsesPerRevolution) {
+    //     return new TalonEncoder(this, encoderType, pulsesPerRevolution);
+    // }
 }
