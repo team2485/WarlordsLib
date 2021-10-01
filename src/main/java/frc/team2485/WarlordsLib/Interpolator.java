@@ -13,6 +13,7 @@ public class Interpolator {
     public Interpolator(Point... points) {
         this.points = new ArrayList<Point>(Arrays.asList(points));
         Collections.sort(this.points);
+        System.out.println(this.points);
     }
 
     public double getOutput(double input) {
@@ -21,14 +22,14 @@ public class Interpolator {
         if(input < points.get(0).X) { //here, we extrapolate from the lowest two points
             bottomI = 0;
             System.out.println("extrapolating <");
-        } else if (input > points.get(points.size() - 1).X) { //here, we extrapolate from the top two points
-            bottomI = points.size() - 1;
+        } else if (input >= points.get(points.size() - 1).X) { //here, we extrapolate from the top two points
+            bottomI = points.size() - 2;
             System.out.println("extrapolating >");
         } else {
             for(int i=0; i<points.size() - 1; i++){ //here, we interpolate from the points bordering the given input
-                if(input > points.get(i).X && input < points.get(i+1).X) {
+                if(input >= points.get(i).X && input < points.get(i+1).X) {
                     bottomI = i;
-                    System.out.println("bottomI: " + i);
+                   System.out.println("bottomI: " + i);
                 }
             }
         }
@@ -36,3 +37,4 @@ public class Interpolator {
         return points.get(bottomI).Y + (input - points.get(bottomI).X)*(points.get(bottomI+1).Y - points.get(bottomI).Y)/(points.get(bottomI+1).X - points.get(bottomI).X);
         
     }
+}
