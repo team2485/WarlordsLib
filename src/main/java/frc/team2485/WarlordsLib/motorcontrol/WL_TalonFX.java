@@ -12,7 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class WL_TalonFX extends WPI_TalonFX {
 
     /**
-     * Constructor for TalonSRX object
+     * Constructor for TalonFX object
      *
      * @param deviceNumber CAN Device ID of Device
      */
