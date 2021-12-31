@@ -20,7 +20,7 @@ public class WL_TalonFX extends WPI_TalonFX {
         super(deviceNumber);
         this.configFactoryDefault();
         this.clearStickyFaults();
-        this.setNeutralMode(NeutralMode.Coast);
+        //this.setNeutralMode(NeutralMode.Coast);
     }
 
     /**
