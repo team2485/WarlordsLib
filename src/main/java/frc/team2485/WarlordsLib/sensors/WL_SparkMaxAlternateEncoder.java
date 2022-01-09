@@ -6,13 +6,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 /**
  * Used to interface with an alternate quadrature encoder plugged into a SparkMax. Not to be used with the Hall Sensor.
  */
-public class SparkMaxAlternateEncoder extends CANEncoder implements EncoderWrapper {
+public class WL_SparkMaxAlternateEncoder  implements EncoderWrapper {
 
-    public SparkMaxAlternateEncoder(CANSparkMax spark, int pulsesPerRevolution) {
-        super(spark, AlternateEncoderType.kQuadrature, pulsesPerRevolution);
+    private RelativeEncoder m_encoder; 
+
+    public WL_SparkMaxAlternateEncoder(CANSparkMax spark, int pulsesPerRevolution) {
+        m_encoder = spark.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, pulsesPerRevolution);
     }
 
-    public SparkMaxAlternateEncoder(int deviceId, int pulsesPerRevolution) {
+    public WL_SparkMaxAlternateEncoder(int deviceId, int pulsesPerRevolution) {
         this(new CANSparkMax(deviceId, CANSparkMaxLowLevel.MotorType.kBrushless), pulsesPerRevolution);
     }
 
@@ -22,7 +24,7 @@ public class SparkMaxAlternateEncoder extends CANEncoder implements EncoderWrapp
      */
     @Override
     public void resetPosition(double position) {
-        handleCANError(this.setPosition(position));
+        handleCANError(m_encoder.setPosition(position));
     }
 
     /**
@@ -31,8 +33,8 @@ public class SparkMaxAlternateEncoder extends CANEncoder implements EncoderWrapp
      */
     @Override
     public void setDistancePerRevolution(double distance) {
-        handleCANError(this.setPositionConversionFactor(distance));
-        handleCANError(this.setVelocityConversionFactor(distance));
+        handleCANError(m_encoder.setPositionConversionFactor(distance));
+        handleCANError(m_encoder.setVelocityConversionFactor(distance));
     }
 
     /**
@@ -41,11 +43,15 @@ public class SparkMaxAlternateEncoder extends CANEncoder implements EncoderWrapp
      */
     @Override
     public double getVelocity() {
-        return super.getVelocity() / 60; // from distance per minute to distance per second
+        return m_encoder.getVelocity() / 60; // from distance per minute to distance per second
     }
 
-    private void handleCANError(CANError error) {
-        if (error != CANError.kOk) {
+    public double getPosition() {
+        return m_encoder.getPosition();
+    }
+
+    private void handleCANError(REVLibError error) {
+        if (error != REVLibError.kOk) {
             DriverStation.reportWarning("Spark Max Encoder Error: " + error.toString(), true);
         }
     }

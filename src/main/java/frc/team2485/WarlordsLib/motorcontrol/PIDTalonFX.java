@@ -6,7 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;

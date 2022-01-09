@@ -1,22 +1,24 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.ControlType;
-import com.revrobotics.EncoderType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxRelativeEncoder;
+
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
-public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController<ControlType, EncoderType> {
+public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController<CANSparkMax.ControlType, SparkMaxRelativeEncoder.Type> {
 
-    private ControlType m_controlType;
+    private CANSparkMax.ControlType m_controlType;
 
-    private CANPIDController m_controller;
+    private SparkMaxPIDController m_controller;
 
-    private CANEncoder m_encoder;
+    private RelativeEncoder m_encoder;
 
     private double m_setpoint;
 
@@ -57,8 +59,8 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
      * @param feedbackDeviceType feedbackDevice
      */
     @Override
-    public void setFeedbackDeviceType(EncoderType feedbackDeviceType) {
-        m_controller.setFeedbackDevice(new CANEncoder(this, feedbackDeviceType, 0)); // the counts per rev is not used
+    public void setFeedbackDeviceType(SparkMaxRelativeEncoder.Type feedbackDeviceType) {
+        m_controller.setFeedbackDevice(this.getEncoder(feedbackDeviceType, 0)); // the counts per rev is not used
     }
 
     @Override
@@ -388,7 +390,7 @@ public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorCo
         }
     }
 
-    public CANPIDController getController() {
+    public SparkMaxPIDController getController() {
         return m_controller;
     }
 

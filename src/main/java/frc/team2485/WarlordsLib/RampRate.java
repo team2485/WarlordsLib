@@ -1,10 +1,18 @@
 package frc.team2485.WarlordsLib;
 
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+
+
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
+
+/**
+ * This class is functional, but 
+ * edu.wpi.first.math.filter.SlewRateLimiter performs the same functionality
+ * and as such this class is not recommended for use. 
+**/
 
 public class RampRate implements Sendable, Configurable {
     private double m_lastValue, m_upRampRate, m_downRampRate;

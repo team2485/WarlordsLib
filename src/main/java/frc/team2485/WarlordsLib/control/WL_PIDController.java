@@ -1,8 +1,8 @@
 package frc.team2485.WarlordsLib.control;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.math.MathUtil;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
@@ -12,7 +12,13 @@ import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
  *      Configurable implementation
  *      Feedforward term
  *      Min and max output
+ * 2022 update:
+ * This class should only be used if the PIDController functionality
+ * provided by WPILib is insufficient. Feedforward terms should generally not be arbitrarily managed;
+ * SimpleMotorFeedforward works if a model or characterization is accessible.
+
  */
+
 public class WL_PIDController extends PIDController implements Configurable {
 
     private double m_Kf = 0;

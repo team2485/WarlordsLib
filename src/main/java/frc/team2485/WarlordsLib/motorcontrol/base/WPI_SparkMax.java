@@ -3,15 +3,13 @@ package frc.team2485.WarlordsLib.motorcontrol.base;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.hal.FRCNetComm;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 /**
  * Basic wrapper for a CAN SparkMax implementing SpeedController and Sendable.
  */
-public class WPI_SparkMax extends CANSparkMax implements SpeedController, Sendable {
+public class WPI_SparkMax extends CANSparkMax implements Sendable {
 
     /**
      * Create a new SPARK MAX Controller
