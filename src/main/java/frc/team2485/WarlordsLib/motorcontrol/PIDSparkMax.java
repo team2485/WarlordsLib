@@ -4,436 +4,470 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkMaxRelativeEncoder;
-
 import edu.wpi.first.util.sendable.SendableBuilder;
-
 import frc.team2485.WarlordsLib.motorcontrol.base.PIDMotorController;
 import frc.team2485.WarlordsLib.robotConfigs.Configurable;
 import frc.team2485.WarlordsLib.robotConfigs.LoadableConfigs;
 import frc.team2485.WarlordsLib.robotConfigs.SavableConfigs;
 
-public class PIDSparkMax extends WL_SparkMax implements Configurable, PIDMotorController<CANSparkMax.ControlType, SparkMaxRelativeEncoder.Type> {
+public class PIDSparkMax extends WL_SparkMax
+    implements Configurable,
+        PIDMotorController<CANSparkMax.ControlType, SparkMaxRelativeEncoder.Type> {
 
-    private CANSparkMax.ControlType m_controlType;
+  private CANSparkMax.ControlType m_controlType;
 
-    private SparkMaxPIDController m_controller;
+  private SparkMaxPIDController m_controller;
 
-    private RelativeEncoder m_encoder;
+  private RelativeEncoder m_encoder;
 
-    private double m_setpoint;
+  private double m_setpoint;
 
-    private double m_kP, m_kI, m_kD, m_kIz, m_kF, m_kMaxOutput, m_kMinOutput, m_kIMaxAccum, m_kFilt, m_filteredInput;
+  private double m_kP,
+      m_kI,
+      m_kD,
+      m_kIz,
+      m_kF,
+      m_kMaxOutput,
+      m_kMinOutput,
+      m_kIMaxAccum,
+      m_kFilt,
+      m_filteredInput;
 
-    private double m_threshold;
+  private double m_threshold;
 
-    /**
-     * Create a new Brushless SPARK MAX Controller
-     * @param deviceID The device ID.
-     */
-    public PIDSparkMax(int deviceID, ControlType controlType) {
-        super(deviceID);
+  /**
+   * Create a new Brushless SPARK MAX Controller
+   *
+   * @param deviceID The device ID.
+   */
+  public PIDSparkMax(int deviceID, ControlType controlType) {
+    super(deviceID);
 
-        this.m_controlType = controlType;
+    this.m_controlType = controlType;
 
-        this.m_encoder = this.getEncoder();
+    this.m_encoder = this.getEncoder();
 
-        this.m_controller = this.getPIDController();
+    this.m_controller = this.getPIDController();
 
-        this.m_controller.setIAccum(0);
+    this.m_controller.setIAccum(0);
 
-        this.m_kP = this.m_controller.getP();
-        this.m_kI = this.m_controller.getI();
-        this.m_kD = this.m_controller.getD();
-        this.m_kIz = this.m_controller.getIZone();
-        this.m_kF = this.m_controller.getFF();
-        this.m_kMaxOutput = this.m_controller.getOutputMax();
-        this.m_kMinOutput = this.m_controller.getOutputMin();
-        this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
+    this.m_kP = this.m_controller.getP();
+    this.m_kI = this.m_controller.getI();
+    this.m_kD = this.m_controller.getD();
+    this.m_kIz = this.m_controller.getIZone();
+    this.m_kF = this.m_controller.getFF();
+    this.m_kMaxOutput = this.m_controller.getOutputMax();
+    this.m_kMinOutput = this.m_controller.getOutputMin();
+    this.m_kIMaxAccum = this.m_controller.getIMaxAccum(0);
 
-        this.m_kFilt = 0;
-        this.m_filteredInput = 0;
+    this.m_kFilt = 0;
+    this.m_filteredInput = 0;
+  }
+
+  /**
+   * Set the PID's feedback device
+   *
+   * @param feedbackDeviceType feedbackDevice
+   */
+  @Override
+  public void setFeedbackDeviceType(SparkMaxRelativeEncoder.Type feedbackDeviceType) {
+    m_controller.setFeedbackDevice(
+        this.getEncoder(feedbackDeviceType, 0)); // the counts per rev is not used
+  }
+
+  @Override
+  public ControlType getControlMode() {
+    return this.m_controlType;
+  }
+
+  @Override
+  public void setControlMode(ControlType controlType) {
+    this.m_controlType = controlType;
+  }
+
+  /**
+   * gets the proportional coefficient
+   *
+   * @return proportional coefficient
+   */
+  @Override
+  public double getP() {
+    return this.m_kP;
+  }
+
+  /**
+   * sets proportional coefficient
+   *
+   * @param kP proportional coefficient
+   */
+  @Override
+  public void setP(double kP) {
+    if (this.m_kP != kP) {
+      m_controller.setP(kP);
+      this.m_kP = kP;
     }
+  }
 
-    /**
-     * Set the PID's feedback device
-     * @param feedbackDeviceType feedbackDevice
-     */
-    @Override
-    public void setFeedbackDeviceType(SparkMaxRelativeEncoder.Type feedbackDeviceType) {
-        m_controller.setFeedbackDevice(this.getEncoder(feedbackDeviceType, 0)); // the counts per rev is not used
+  /**
+   * gets the Integral coefficient
+   *
+   * @return integral coefficient
+   */
+  @Override
+  public double getI() {
+    return this.m_kI;
+  }
+
+  /**
+   * Set integral coefficient
+   *
+   * @param kI integral coefficient
+   */
+  @Override
+  public void setI(double kI) {
+    if (this.m_kI != kI) {
+      m_controller.setI(kI);
+      this.m_kI = kI;
     }
+  }
 
-    @Override
-    public ControlType getControlMode() {
-        return this.m_controlType;
+  /**
+   * gets the Differential coefficient
+   *
+   * @return differential coefficient
+   */
+  @Override
+  public double getD() {
+    return this.m_kD;
+  }
+
+  /**
+   * Set differential coefficient
+   *
+   * @param kD differential coefficient
+   */
+  @Override
+  public void setD(double kD) {
+    if (this.m_kD != kD) {
+      m_controller.setD(kD);
+      this.m_kD = kD;
     }
+  }
 
-    @Override
-    public void setControlMode(ControlType controlType) {
-        this.m_controlType = controlType;
+  /**
+   * gets IZone value of slot 0. The max distance from target where I term will be calculated
+   *
+   * @return IZone value
+   */
+  public double getIzone() {
+    return this.m_kIz;
+  }
+
+  /**
+   * Set max distance from target where I term will be calculated
+   *
+   * @param kIz IZone value
+   */
+  public void setIzone(double kIz) {
+    if (this.m_kIz != kIz) {
+      m_controller.setIZone(kIz);
+      this.m_kIz = kIz;
     }
+  }
 
-    /**
-     * gets the proportional coefficient
-     * @return proportional coefficient
-     */
-    @Override
-    public double getP() {
-        return this.m_kP;
+  /**
+   * gets max I accumulator. Constrains I accumulator to prevent integral windup.
+   *
+   * @return max I Accumulator
+   */
+  public double getIMaxAccum() {
+    return this.m_kIMaxAccum;
+  }
+
+  /**
+   * Sets max I accumulator. Constrains I accumulator to prevent integral windup.
+   *
+   * @param kIMaxAccum max I Accumulator
+   */
+  public void setIMaxAccum(double kIMaxAccum) {
+    if (this.m_kIMaxAccum != kIMaxAccum) {
+      m_controller.setIMaxAccum(kIMaxAccum, 0);
+      this.m_kIMaxAccum = kIMaxAccum;
     }
+  }
 
-    /**
-     * sets proportional coefficient
-     * @param kP proportional coefficient
-     */
-    @Override
-    public void setP(double kP) {
-        if (this.m_kP != kP) {
-            m_controller.setP(kP);
-            this.m_kP = kP;
-        }
+  /**
+   * gets feed forward gain
+   *
+   * @return Fees-forward Gain
+   */
+  public double getF() {
+    return this.m_kF;
+  }
+
+  /**
+   * Sets feed forward gain
+   *
+   * @param kF feed forward gain
+   */
+  public void setF(double kF) {
+    if (this.m_kF != kF) {
+      m_controller.setFF(kF);
+      this.m_kF = kF;
     }
+  }
 
-    /**
-     * gets the Integral coefficient
-     * @return integral coefficient
-     */
-    @Override
-    public double getI() {
-        return this.m_kI;
+  /**
+   * gets max output
+   *
+   * @return maximum output
+   */
+  public double getMaxOutput() {
+    return m_controller.getOutputMax();
+  }
 
+  /**
+   * gets min output
+   *
+   * @return minimum output
+   */
+  public double getMinOutput() {
+    return m_controller.getOutputMin();
+  }
+
+  /**
+   * Set P, I and D constants
+   *
+   * @param p proportional coefficient
+   * @param i integral coefficient
+   * @param d derivative coefficient
+   */
+  public void setPID(double p, double i, double d) {
+    this.setP(p);
+    this.setI(i);
+    this.setD(d);
+  }
+
+  /**
+   * Set P, I, D, and F constants
+   *
+   * @param p proportional coefficient
+   * @param i integral coefficient
+   * @param d derivative coefficient
+   * @param f feed forward coefficient
+   */
+  public void setPIDF(double p, double i, double d, double f) {
+    this.setP(p);
+    this.setI(i);
+    this.setD(d);
+    this.setF(f);
+  }
+
+  /**
+   * Set min and max output of PID
+   *
+   * @param kMinOutput min output
+   * @param kMaxOutput max output
+   */
+  public void setOutputRange(double kMinOutput, double kMaxOutput) {
+    if ((this.m_kMinOutput != kMinOutput) || (this.m_kMaxOutput != kMaxOutput)) {
+      m_controller.setOutputRange(kMinOutput, kMaxOutput);
+      this.m_kMinOutput = kMinOutput;
+      this.m_kMaxOutput = kMaxOutput;
     }
+  }
 
-    /**
-     * Set integral coefficient
-     * @param kI integral coefficient
-     */
-    @Override
-    public void setI(double kI) {
-        if (this.m_kI != kI) {
-            m_controller.setI(kI);
-            this.m_kI = kI;
-        }
+  /** Run PID on this controller from setpoint */
+  @Override
+  public void runPID() {
+    m_controller.setReference(m_setpoint, m_controlType);
+  }
+
+  /**
+   * Set setpoint and run PID on this controller
+   *
+   * @param target
+   */
+  @Override
+  public void runPID(double target) {
+    setSetpoint(target);
+    runPID();
+  }
+
+  /**
+   * Set the controller reference value based on the selected control mode.
+   *
+   * @param setpoint The value to set depending on the control mode.
+   */
+  @Override
+  public void setSetpoint(double setpoint) {
+    this.m_setpoint = setpoint;
+  }
+
+  /**
+   * get setpoint
+   *
+   * @return setpoint
+   */
+  public double getSetpoint() {
+    return this.m_setpoint;
+  }
+
+  /** resets PID controller. */
+  @Override
+  public void resetPID() {
+    this.m_controller.setIAccum(0);
+  }
+
+  /**
+   * resets encoder to a given position
+   *
+   * @param position desired position
+   */
+  @Override
+  public void setEncoderPosition(double position) {
+    m_encoder.setPosition(position);
+  }
+
+  public double getkFilter() {
+    return this.m_kFilt;
+  }
+
+  public void setkFilter(double kFilt) {
+    this.m_kFilt = kFilt;
+  }
+
+  public double getFilteredOutputCurrent() {
+    m_filteredInput += (this.getOutputCurrent() - m_filteredInput) * m_kFilt;
+    return m_filteredInput;
+  }
+
+  /**
+   * Set threshold for atTarget()
+   *
+   * @param tolerance pid is at target if within sensor output +/- this value
+   */
+  public void setTolerance(double tolerance) {
+    this.m_threshold = Math.abs(tolerance);
+  }
+
+  /**
+   * Get threshold for controller
+   *
+   * @return threshold
+   */
+  public double getThreshold() {
+    return this.m_threshold;
+  }
+
+  /**
+   * Returns true if sensor output is within a given threshold
+   *
+   * @return true when sensor is within threshold
+   */
+  public boolean atTarget() {
+    return atTarget(this.m_threshold);
+  }
+
+  /**
+   * Returns true if sensor output is within a given threshold
+   *
+   * @param threshold pid is at target if within sensor output +/- this value
+   * @return true when sensor is within threshold
+   */
+  public boolean atTarget(double threshold) {
+    return Math.abs(this.getSensorOutput() - this.getSetpoint()) < threshold;
+  }
+
+  public double getSensorOutput(ControlType controlType) {
+    switch (controlType) {
+      case kCurrent:
+        return this.getFilteredOutputCurrent();
+      case kSmartVelocity:
+      case kVelocity:
+        return m_encoder.getVelocity();
+      case kSmartMotion:
+      case kPosition:
+        return m_encoder.getPosition();
+      case kVoltage:
+        return this.getBusVoltage();
+      case kDutyCycle:
+        return this.getAppliedOutput();
+      default:
+        return 0;
     }
+  }
 
-    /**
-     * gets the Differential coefficient
-     * @return differential coefficient
-     */
-    @Override
-    public double getD() {
-        return this.m_kD;
+  /**
+   * Get output depending on the {@link ControlType}
+   *
+   * @return output of pid
+   */
+  @Override
+  public double getSensorOutput() {
+    switch (m_controlType) {
+      case kCurrent:
+        return this.getFilteredOutputCurrent();
+      case kSmartVelocity:
+      case kVelocity:
+        return m_encoder.getVelocity();
+      case kSmartMotion:
+      case kPosition:
+        return m_encoder.getPosition();
+      case kVoltage:
+        return this.getBusVoltage();
+      case kDutyCycle:
+        return this.getAppliedOutput();
+      default:
+        return 0;
     }
+  }
 
-    /**
-     * Set differential coefficient
-     * @param kD differential coefficient
-     */
-    @Override
-    public void setD(double kD) {
-        if (this.m_kD != kD) {
-            m_controller.setD(kD);
-            this.m_kD = kD;
-        }
-    }
+  public SparkMaxPIDController getController() {
+    return m_controller;
+  }
 
-    /**
-     * gets IZone value of slot 0. The max distance from target where I term will be calculated
-     * @return IZone value
-     */
-    public double getIzone() {
-        return this.m_kIz;
-    }
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.setSmartDashboardType("PIDController");
+    builder.addDoubleProperty("p", this::getP, this::setP);
+    builder.addDoubleProperty("i", this::getI, this::setI);
+    builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("f", this::getF, this::setF);
+    builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
+    builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
+    builder.addDoubleProperty(
+        "closedLoopRampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
+    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    builder.addDoubleProperty("kFilter", this::getkFilter, this::setkFilter);
+    builder.addDoubleProperty("Output", this::getSensorOutput, null);
+  }
 
-    /**
-     * Set max distance from target where I term will be calculated
-     * @param kIz IZone value
-     */
-    public void setIzone(double kIz) {
-        if (this.m_kIz != kIz) {
-            m_controller.setIZone(kIz);
-            this.m_kIz = kIz;
-        }
-    }
+  @Override
+  public void loadConfigs(LoadableConfigs configs) {
+    this.setP(configs.getDouble("p", this.getP()));
+    this.setI(configs.getDouble("i", this.getI()));
+    this.setD(configs.getDouble("d", this.getD()));
+    this.setF(configs.getDouble("f", this.getF()));
+    this.setIzone(configs.getDouble("iZone", this.getIzone()));
+    this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
+    this.setClosedLoopRampRate(configs.getDouble("rampRate", this.getClosedLoopRampRate()));
+    this.setkFilter(configs.getDouble("kFilter", this.getkFilter()));
+    this.setClosedLoopRampRate(
+        configs.getDouble("closedLoopRampRate", this.getClosedLoopRampRate()));
+  }
 
-    /**
-     * gets max I accumulator. Constrains I accumulator to prevent integral windup.
-     * @return max I Accumulator
-     */
-    public double getIMaxAccum() {
-        return this.m_kIMaxAccum;
-    }
-
-    /**
-     * Sets max I accumulator. Constrains I accumulator to prevent integral windup.
-     * @param kIMaxAccum max I Accumulator
-     */
-    public void setIMaxAccum(double kIMaxAccum) {
-        if (this.m_kIMaxAccum != kIMaxAccum) {
-            m_controller.setIMaxAccum(kIMaxAccum, 0);
-            this.m_kIMaxAccum = kIMaxAccum;
-        }
-    }
-
-    /**
-     * gets feed forward gain
-     * @return Fees-forward Gain
-     */
-    public double getF() {
-        return this.m_kF;
-    }
-
-    /**
-     * Sets feed forward gain
-     * @param kF feed forward gain
-     */
-    public void setF(double kF) {
-        if (this.m_kF != kF) {
-            m_controller.setFF(kF);
-            this.m_kF = kF;
-        }
-    }
-
-    /**
-     * gets max output
-     * @return maximum output
-     */
-    public double getMaxOutput() {
-        return m_controller.getOutputMax();
-    }
-
-    /**
-     * gets min output
-     * @return minimum output
-     */
-    public double getMinOutput() {
-        return m_controller.getOutputMin();
-    }
-
-    /**
-     * Set P, I and D constants
-     * @param p proportional coefficient
-     * @param i integral coefficient
-     * @param d derivative coefficient
-     */
-    public void setPID(double p, double i,double d) {
-        this.setP(p);
-        this.setI(i);
-        this.setD(d);
-    }
-
-    /**
-     * Set P, I, D, and F constants
-     * @param p proportional coefficient
-     * @param i integral coefficient
-     * @param d derivative coefficient
-     * @param f feed forward coefficient
-     */
-    public void setPIDF(double p, double i, double d, double f) {
-        this.setP(p);
-        this.setI(i);
-        this.setD(d);
-        this.setF(f);
-    }
-
-    /**
-     * Set min and max output of PID
-     * @param kMinOutput min output
-     * @param kMaxOutput max output
-     */
-    public void setOutputRange(double kMinOutput, double kMaxOutput) {
-        if ((this.m_kMinOutput != kMinOutput) || (this.m_kMaxOutput != kMaxOutput)) {
-            m_controller.setOutputRange(kMinOutput, kMaxOutput);
-            this.m_kMinOutput = kMinOutput;
-            this.m_kMaxOutput = kMaxOutput;
-        }
-    }
-
-    /**
-     * Run PID on this controller from setpoint
-     */
-    @Override
-    public void runPID() {
-        m_controller.setReference(m_setpoint, m_controlType);
-    }
-
-    /**
-     * Set setpoint and run PID on this controller
-     * @param target
-     */
-    @Override
-    public void runPID(double target) {
-        setSetpoint(target);
-        runPID();
-    }
-
-    /**
-     * Set the controller reference value based on the selected control mode.
-     * @param setpoint The value to set depending on the control mode.
-     */
-    @Override
-    public void setSetpoint(double setpoint) {
-        this.m_setpoint = setpoint;
-    }
-
-    /**
-     * get setpoint
-     * @return setpoint
-     */
-    public double getSetpoint() {
-        return this.m_setpoint;
-    }
-
-    /**
-     * resets PID controller.
-     */
-    @Override
-    public void resetPID() {
-        this.m_controller.setIAccum(0);
-    }
-
-    /**
-     * resets encoder to a given position
-     * @param position desired position
-     */
-    @Override
-    public void setEncoderPosition(double position) {
-        m_encoder.setPosition(position);
-    }
-
-    public double getkFilter() {
-        return this.m_kFilt;
-    }
-
-    public void setkFilter(double kFilt) {
-        this.m_kFilt = kFilt;
-    }
-
-    public double getFilteredOutputCurrent() {
-        m_filteredInput += (this.getOutputCurrent() - m_filteredInput) * m_kFilt;
-        return m_filteredInput;
-    }
-
-    /**
-     * Set threshold for atTarget()
-     * @param tolerance  pid is at target if within sensor output +/- this value
-     */
-    public void setTolerance(double tolerance) {
-        this.m_threshold = Math.abs(tolerance);
-    }
-
-    /**
-     * Get threshold for controller
-     * @return threshold
-     */
-    public double getThreshold(){
-        return this.m_threshold;
-    }
-
-    /**
-     * Returns true if sensor output is within a given threshold
-     * @return true when sensor is within threshold
-     */
-    public boolean atTarget() {
-        return atTarget(this.m_threshold);
-    }
-
-    /**
-     * Returns true if sensor output is within a given threshold
-     * @param threshold pid is at target if within sensor output +/- this value
-     * @return true when sensor is within threshold
-     */
-    public boolean atTarget(double threshold) {
-        return Math.abs(this.getSensorOutput() - this.getSetpoint()) < threshold;
-    }
-
-    public double getSensorOutput(ControlType controlType) {
-        switch (controlType) {
-            case kCurrent:
-                return this.getFilteredOutputCurrent();
-            case kSmartVelocity:
-            case kVelocity:
-                return m_encoder.getVelocity();
-            case kSmartMotion:
-            case kPosition:
-                return m_encoder.getPosition();
-            case kVoltage:
-                return this.getBusVoltage();
-            case kDutyCycle:
-                return this.getAppliedOutput();
-            default:
-                return 0;
-        }
-    }
-
-    /**
-     * Get output depending on the {@link ControlType}
-     * @return output of pid
-     */
-    @Override
-    public double getSensorOutput()  {
-        switch (m_controlType) {
-            case kCurrent:
-                return this.getFilteredOutputCurrent();
-            case kSmartVelocity:
-            case kVelocity:
-                return m_encoder.getVelocity();
-            case kSmartMotion:
-            case kPosition:
-                return m_encoder.getPosition();
-            case kVoltage:
-                return this.getBusVoltage();
-            case kDutyCycle:
-                return this.getAppliedOutput();
-            default:
-                return 0;
-        }
-    }
-
-    public SparkMaxPIDController getController() {
-        return m_controller;
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        super.initSendable(builder);
-        builder.setSmartDashboardType("PIDController");
-        builder.addDoubleProperty("p", this::getP, this::setP);
-        builder.addDoubleProperty("i", this::getI, this::setI);
-        builder.addDoubleProperty("d", this::getD, this::setD);
-        builder.addDoubleProperty("f", this::getF, this::setF);
-        builder.addDoubleProperty("iZone", this::getIzone, this::setIzone);
-        builder.addDoubleProperty("iMaxAccum", this::getIMaxAccum, this::setIMaxAccum);
-        builder.addDoubleProperty("closedLoopRampRate", this::getClosedLoopRampRate, this::setClosedLoopRampRate);
-        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-        builder.addDoubleProperty("kFilter", this::getkFilter,this::setkFilter);
-        builder.addDoubleProperty("Output", this::getSensorOutput, null);
-    }
-
-
-    @Override
-    public void loadConfigs(LoadableConfigs configs) {
-        this.setP(configs.getDouble("p", this.getP()));
-        this.setI(configs.getDouble("i", this.getI()));
-        this.setD(configs.getDouble("d", this.getD()));
-        this.setF(configs.getDouble("f", this.getF()));
-        this.setIzone(configs.getDouble("iZone", this.getIzone()));
-        this.setIMaxAccum(configs.getDouble("iMaxAccum", this.getIMaxAccum()));
-        this.setClosedLoopRampRate(configs.getDouble("rampRate", this.getClosedLoopRampRate()));
-        this.setkFilter(configs.getDouble("kFilter", this.getkFilter()));
-        this.setClosedLoopRampRate(configs.getDouble("closedLoopRampRate", this.getClosedLoopRampRate()));
-    }
-
-    @Override
-    public void saveConfigs(SavableConfigs configs) {
-        configs.put("p", this.getP());
-        configs.put("i", this.getI());
-        configs.put("d", this.getD());
-        configs.put("f", this.getF());
-        configs.put("iZone", this.getIzone());
-        configs.put("iMaxAccum", this.getIMaxAccum());
-        configs.put("rampRate", this.getClosedLoopRampRate());
-        configs.put("kFilter", this.getkFilter());
-        configs.put("closedLoopRampRate", this.getClosedLoopRampRate());
-    }
+  @Override
+  public void saveConfigs(SavableConfigs configs) {
+    configs.put("p", this.getP());
+    configs.put("i", this.getI());
+    configs.put("d", this.getD());
+    configs.put("f", this.getF());
+    configs.put("iZone", this.getIzone());
+    configs.put("iMaxAccum", this.getIMaxAccum());
+    configs.put("rampRate", this.getClosedLoopRampRate());
+    configs.put("kFilter", this.getkFilter());
+    configs.put("closedLoopRampRate", this.getClosedLoopRampRate());
+  }
 }

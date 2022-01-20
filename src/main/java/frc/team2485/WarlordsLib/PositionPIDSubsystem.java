@@ -2,10 +2,9 @@ package frc.team2485.WarlordsLib;
 
 public interface PositionPIDSubsystem extends Tunable {
 
-    double getEncoderPosition();
+  double getEncoderPosition();
 
-    void runPositionPID(double position);
+  void runPositionPID(double position);
 
-    boolean atPositionSetpoint();
-
+  boolean atPositionSetpoint();
 }
