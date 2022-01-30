@@ -26,8 +26,8 @@ public class Interpolator {
     if (inputKey == higher) {
       return map.get(higher);
     }
-    // interpolate based on these points
-    return map.get(lower)
-        + ((inputKey - lower) / (higher - lower)) * (map.get(higher) - map.get(lower));
+
+    double t = (inputKey - lower) / (higher - lower);
+    return MathUtil.interpolate(map.get(lower), map.get(higher), t);
   }
 }
