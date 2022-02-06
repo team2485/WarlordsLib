@@ -1,4 +1,4 @@
-package frc.team2485.WarlordsLib;
+package frc.team2485.WarlordsLib.sensors;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
