@@ -8,7 +8,6 @@ package frc.team2485.WarlordsLib.sendableRichness;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
@@ -19,7 +18,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 public class SR_ProfiledPIDController implements Sendable {
   private static int instances;
 
-  private PIDController m_controller;
+  private SR_PIDController m_controller;
   private double m_minimumInput;
   private double m_maximumInput;
   private SR_TrapezoidProfile.State m_goal = new SR_TrapezoidProfile.State();
@@ -53,7 +52,7 @@ public class SR_ProfiledPIDController implements Sendable {
   @SuppressWarnings("ParameterName")
   public SR_ProfiledPIDController(
       double Kp, double Ki, double Kd, SR_TrapezoidProfile.Constraints constraints, double period) {
-    m_controller = new PIDController(Kp, Ki, Kd, period);
+    m_controller = new SR_PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
     instances++;
     MathSharedStore.reportUsage(MathUsageId.kController_ProfiledPIDController, instances);
