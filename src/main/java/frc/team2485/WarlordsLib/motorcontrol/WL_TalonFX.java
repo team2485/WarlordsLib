@@ -3,9 +3,10 @@ package frc.team2485.WarlordsLib.motorcontrol;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import frc.team2485.WarlordsLib.CurrentLogger.CurrentLoggable;
 import frc.team2485.WarlordsLib.sensors.TalonEncoder;
 
-public class WL_TalonFX extends WPI_TalonFX {
+public class WL_TalonFX extends WPI_TalonFX implements CurrentLoggable {
 
   /**
    * Constructor for TalonFX object

@@ -1,11 +1,12 @@
 package frc.team2485.WarlordsLib.motorcontrol;
 
 import com.revrobotics.CANSparkMax;
+import frc.team2485.WarlordsLib.CurrentLogger.CurrentLoggable;
 import frc.team2485.WarlordsLib.motorcontrol.base.WPI_SparkMax;
 import frc.team2485.WarlordsLib.sensors.WL_SparkMaxAlternateEncoder;
 
 /** Warlords wrapper for Spark Max with convenience functions. */
-public class WL_SparkMax extends WPI_SparkMax {
+public class WL_SparkMax extends WPI_SparkMax implements CurrentLoggable {
 
   /**
    * Create a new SPARK MAX Controller
@@ -46,5 +47,9 @@ public class WL_SparkMax extends WPI_SparkMax {
 
   public WL_SparkMaxAlternateEncoder getWLAlternateEncoder(int pulsesPerRevolution) {
     return new WL_SparkMaxAlternateEncoder(this, pulsesPerRevolution);
+  }
+
+  public double getSupplyCurrent() {
+    return this.get() * this.getOutputCurrent();
   }
 }

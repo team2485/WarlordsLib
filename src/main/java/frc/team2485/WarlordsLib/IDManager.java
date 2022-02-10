@@ -6,6 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * A singleton class for dynamically selecting constants based on the robot in use. Reads a file on
+ * the roboRIO with an "ID" and uses that value to select from a provided list of constants.
+ */
 public class IDManager {
   private static volatile IDManager m_instance;
 
