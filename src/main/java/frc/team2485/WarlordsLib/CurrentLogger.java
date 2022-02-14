@@ -30,7 +30,7 @@ public class CurrentLogger {
    */
   public static CurrentLogger getInstance() {
     if (m_instance == null) {
-      synchronized (IDManager.class) {
+      synchronized (CurrentLogger.class) {
         if (m_instance == null) {
           m_instance = new CurrentLogger();
         }
@@ -55,12 +55,13 @@ public class CurrentLogger {
    * @param folderPath path of roboRIO folder (if unsure, use "/home/lvuser/currentLogs" or similar)
    */
   public void registerLogFolder(String folderPath) {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm");
     LocalDateTime now = LocalDateTime.now();
+
     try {
       m_file = new File(folderPath + "/currentLog_" + now.format(dtf) + ".csv");
       FileWriter writer = new FileWriter(m_file);
-      writer.append("time");
+      writer.write("time");
       writer.close();
     } catch (IOException e) {
       e.printStackTrace();
@@ -76,9 +77,10 @@ public class CurrentLogger {
    */
   public void register(CurrentLoggable c, String name) {
     m_toLog.add(c);
+
     try {
       FileWriter writer = new FileWriter(m_file, true);
-      writer.append(", " + name);
+      writer.write(", " + name);
       writer.close();
     } catch (IOException e) {
       e.printStackTrace();
@@ -93,15 +95,15 @@ public class CurrentLogger {
     if (m_file != null) {
       try {
         FileWriter writer = new FileWriter(m_file, true);
-        writer.append("\n" + Timer.getFPGATimestamp());
+        writer.write("\n" + Timer.getFPGATimestamp());
         writer.close();
       } catch (IOException e) {
         e.printStackTrace();
       }
       for (CurrentLoggable c : m_toLog) {
         try {
-          FileWriter writer = new FileWriter(m_file);
-          writer.append(", " + String.format("%.3f", c.getSupplyCurrent()));
+          FileWriter writer = new FileWriter(m_file, true);
+          writer.write(", " + String.format("%.3f", c.getSupplyCurrent()));
           writer.close();
         } catch (IOException e) {
           e.printStackTrace();
