@@ -376,9 +376,25 @@ public class SR_ProfiledPIDController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    m_controller.initSendable(builder);
+    builder.addDoubleProperty("p", this::getP, this::setP);
+    builder.addDoubleProperty("i", this::getI, this::setI);
+    builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty(
+        "positionTolerance",
+        m_controller::getPositionTolerance,
+        (positionTolerance) ->
+            m_controller.setTolerance(positionTolerance, m_controller.getVelocityTolerance()));
+    builder.addDoubleProperty(
+        "velocityTolerance",
+        m_controller::getVelocityTolerance,
+        (velocityTolerance) ->
+            m_controller.setTolerance(m_controller.getPositionTolerance(), velocityTolerance));
+    builder.addDoubleProperty("setpoint", m_controller::getSetpoint, m_controller::setSetpoint);
+    builder.addDoubleProperty("measurement", m_controller::getMeasurement, null);
+    builder.addDoubleProperty("positionError", m_controller::getPositionError, null);
+    builder.addDoubleProperty("velocityError", m_controller::getVelocityError, null);
+    builder.addBooleanProperty("atSetpoint", m_controller::atSetpoint, null);
     builder.setSmartDashboardType("ProfiledPIDController");
-    builder.addDoubleProperty("setpoint", m_controller::getSetpoint, null);
     builder.addDoubleProperty(
         "maxVelocity",
         () -> m_constraints.maxVelocity,
