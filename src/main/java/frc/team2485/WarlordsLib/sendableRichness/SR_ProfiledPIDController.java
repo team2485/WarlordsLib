@@ -390,6 +390,9 @@ public class SR_ProfiledPIDController implements Sendable {
         (velocityTolerance) ->
             m_controller.setTolerance(m_controller.getPositionTolerance(), velocityTolerance));
     builder.addDoubleProperty("setpoint", m_controller::getSetpoint, m_controller::setSetpoint);
+    builder.addDoubleProperty("positionSetpoint", () -> this.getSetpoint().position, null);
+    builder.addDoubleProperty("velocitySetpoint", () -> m_setpoint.velocity, null);
+
     builder.addDoubleProperty("measurement", m_controller::getMeasurement, null);
     builder.addDoubleProperty("positionError", m_controller::getPositionError, null);
     builder.addDoubleProperty("velocityError", m_controller::getVelocityError, null);
